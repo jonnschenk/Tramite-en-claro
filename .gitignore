@@ -1,0 +1,39 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (API keys, secretos)
+.env
+.env.*
+!.env.example
+
+# Builds
+dist/
+build/
+.vite/
+.next/
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Sistema operativo / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Caché
+.cache/
+.eslintcache
+
+# Generados por scripts (descomenta si se regeneran con ingest/evals)
+# backend/data/index.json
+# backend/evals/results/
+
+.env
+.env.*
+!.env.example
