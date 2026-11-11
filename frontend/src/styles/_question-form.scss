@@ -1,0 +1,108 @@
+// Bloque BEM: question-form (campo de pregunta)
+@use 'tokens' as *;
+
+.question-form {
+  display: grid;
+  gap: 8px;
+
+  &__field {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 8px;
+    background: $color-surface;
+    border: 1.5px solid $color-input-border;
+    border-radius: $radius-input;
+
+    // El contorno de foco se pinta en todo el campo, no solo en el textarea.
+    &:focus-within {
+      outline: 3px solid $color-accent;
+      outline-offset: 2px;
+    }
+
+    &--invalid {
+      border-color: $color-error-strong;
+    }
+  }
+
+  &__input {
+    flex: 1;
+    min-height: $touch-target;
+    padding: 12px 8px;
+    border: 0;
+    background: transparent;
+    color: $color-text;
+    font-size: $font-size-body; // 16 px: evita el zoom automático de iOS
+    line-height: 1.4;
+    resize: none;
+
+    &:focus-visible {
+      outline: none; // ya lo pinta &__field:focus-within
+    }
+
+    &::placeholder {
+      color: $color-text-secondary;
+    }
+
+    &:disabled {
+      background: transparent;
+      color: $color-text-secondary;
+    }
+  }
+
+  &__submit {
+    min-height: $touch-target;
+    padding-inline: 20px;
+    border: 0;
+    border-radius: $radius-pill;
+    background: $color-button;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:disabled {
+      background: $color-button-disabled;
+      cursor: progress;
+    }
+  }
+
+  &__meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 0.875rem;
+    color: $color-text-secondary;
+  }
+
+  &__hint,
+  &__counter {
+    margin: 0;
+  }
+
+  &__counter {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+
+    &--over {
+      color: $color-error-strong;
+      font-weight: 600;
+    }
+  }
+
+  &__error {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0;
+    color: $color-error-text;
+    font-weight: 500;
+  }
+
+  &__error-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: $color-error-strong;
+  }
+}
