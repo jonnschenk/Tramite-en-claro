@@ -1,11 +1,20 @@
-import { mockResponses } from './mocks/ask-responses.js';
+import { useState } from 'react';
+import { askQuestion } from './api/ask.js';
 
-// Pantalla temporal: solo comprueba que React, Sass y los mocks funcionan.
+// Pantalla temporal: prueba askQuestion con los mocks.
 function App() {
+  const [result, setResult] = useState(null);
+
+  async function handleClick() {
+    setResult({ state: 'loading' });
+    setResult(await askQuestion('¿Cuánto cuesta una copia certificada?'));
+  }
+
   return (
     <main>
       <h1>Trámite en claro</h1>
-      <pre>{JSON.stringify(mockResponses.answered, null, 2)}</pre>
+      <button onClick={handleClick}>Probar</button>
+      <pre>{JSON.stringify(result, null, 2)}</pre>
     </main>
   );
 }
