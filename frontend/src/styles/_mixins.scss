@@ -1,0 +1,35 @@
+// Mixins: bloques de estilo que se repiten en varios componentes.
+@use 'tokens' as *;
+
+// Layout web (mobile-first: los estilos base son de móvil).
+@mixin web {
+  @media (min-width: $bp-web) {
+    @content;
+  }
+}
+
+// Vidrio con respaldo para navegadores sin backdrop-filter.
+@mixin glass {
+  background: $glass-fallback;
+  border: 1px solid $glass-border;
+
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    background: $glass-bg;
+    -webkit-backdrop-filter: $glass-blur;
+    backdrop-filter: $glass-blur;
+  }
+}
+
+// Texto pequeño en mayúsculas sobre los títulos.
+@mixin eyebrow {
+  font-size: $font-size-eyebrow;
+  font-weight: 600;
+  letter-spacing: $tracking-eyebrow;
+  text-transform: uppercase;
+}
+
+// Contorno de foco visible para teclado.
+@mixin focus-ring {
+  outline: 3px solid $color-accent;
+  outline-offset: 2px;
+}

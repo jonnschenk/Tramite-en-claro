@@ -1,0 +1,72 @@
+// Tokens: todos los valores de diseño viven aquí (docs: claude/entrega-fase-1-diseno.md).
+// Los componentes nunca escriben un color a mano: siempre usan estas variables.
+@use 'sass:color';
+
+// --- Color del proyecto -------------------------------------------------------
+// Para cambiar el acento, cambia SOLO esta línea. El hover y el relleno de los
+// números de paso se calculan a partir de ella.
+$color-accent: #1f5f7a;
+$color-accent-hover: color.mix(#000, $color-accent, 28%);
+$color-accent-soft: color.mix($color-accent, #fff, 13%);
+
+// --- Neutros -----------------------------------------------------------------
+$color-bg: #eef1f2;
+$color-text: #0b1220;
+$color-text-secondary: #5d6771;
+$color-border: #d5dbdf;
+$color-fill-soft: #e3e8ea;
+$color-surface: #fff;
+
+// --- Campo y botón -----------------------------------------------------------
+$color-input-border: #7b8590;
+$color-button: #0b1220;
+$color-button-disabled: #6b747e;
+
+// --- Estados -----------------------------------------------------------------
+// Aviso "no es un sitio oficial" (ámbar)
+$color-notice-bg: #f6eed8;
+$color-notice-border: #e7d9ae;
+$color-notice-text: #57420a;
+
+// Sin información (gris azulado, NO es error)
+$color-noinfo-bg: #e4eaed;
+$color-noinfo-border: #c6d0d6;
+$color-noinfo-text: #34414d;
+$color-noinfo-icon: #394b59;
+
+// Error (arcilla)
+$color-error-bg: #f8ebe5;
+$color-error-border: #e8c3b3;
+$color-error-text: #6b3420;
+$color-error-title: #5e2914;
+$color-error-strong: #8a3f22;
+
+// --- Vidrio (encabezado y barra de pregunta) ---------------------------------
+$glass-bg: rgba(255, 255, 255, 0.55);
+$glass-blur: blur(20px) saturate(180%);
+$glass-border: rgba(255, 255, 255, 0.75);
+$glass-fallback: rgba(238, 241, 242, 0.94);
+
+// --- Radios y sombras --------------------------------------------------------
+$radius-pill: 999px;
+$radius-card-mobile: 24px;
+$radius-card-web: 30px;
+$radius-input: 18px;
+$shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 24px 48px -12px rgba(15, 23, 42, 0.14);
+
+// --- Tipografía --------------------------------------------------------------
+$font-family: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+$font-size-body: 1rem; // 16 px (también el campo: evita el zoom de iOS)
+$font-size-body-large: 1.0625rem; // 17 px
+$font-size-eyebrow: 0.75rem; // 12 px
+$line-height-body: 1.6;
+$tracking-title: -0.03em;
+$tracking-title-tight: -0.045em;
+$tracking-eyebrow: 0.08em;
+
+// --- Tamaños y layout --------------------------------------------------------
+$touch-target: 48px;
+$container-max: 1240px;
+$container-width: min(92%, $container-max);
+$home-column-max: 760px;
+$bp-web: 960px; // a partir de aquí, layout web
