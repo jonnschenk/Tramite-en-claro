@@ -1,0 +1,15 @@
+// Bloque BEM: card (tarjeta base para cargando, respuesta y estados)
+@use 'tokens' as *;
+@use 'mixins' as *;
+
+.card {
+  padding: 20px;
+  background: $color-surface;
+  border-radius: $radius-card-mobile;
+  box-shadow: $shadow-card;
+
+  @include web {
+    padding: 28px;
+    border-radius: $radius-card-web;
+  }
+}

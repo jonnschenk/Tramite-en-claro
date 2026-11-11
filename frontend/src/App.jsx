@@ -3,12 +3,23 @@ import { askQuestion, validateQuestion } from './api/ask.js';
 import Header from './components/Header.jsx';
 import Notice from './components/Notice.jsx';
 import QuestionForm from './components/QuestionForm.jsx';
+import SuggestedQuestions from './components/SuggestedQuestions.jsx';
+import LoadingState from './components/LoadingState.jsx';
+
+// Preguntas que el corpus sí cubre (fuentes 01, 02, 05 y 06).
+const SUGGESTIONS = [
+  '¿Cómo saco mi acta en línea?',
+  '¿Cuánto cuesta una copia certificada?',
+  '¿Dónde hay una oficina del Registro Civil?',
+  '¿Cómo corrijo un error en mi acta?',
+];
 
 function App() {
   const [question, setQuestion] = useState('');
   const [formError, setFormError] = useState(null);
   const [result, setResult] = useState(null);
 
+  const isIdle = result === null;
   const isLoading = result?.state === 'loading';
 
   function handleChange(text) {
@@ -25,6 +36,13 @@ function App() {
     }
     sendQuestion(question);
     return true;
+  }
+
+  // Una píldora llena el campo y envía la pregunta de una vez.
+  function handleSuggestion(text) {
+    setQuestion(text);
+    setFormError(null);
+    sendQuestion(text);
   }
 
   async function sendQuestion(text) {
@@ -45,6 +63,25 @@ function App() {
       <Header />
       <main className="page">
         <Notice />
+
+        {isIdle ? (
+          <div className="hero">
+            <h1 className="hero__title">
+              Tu acta de nacimiento, en claro<span className="hero__dot">.</span>
+            </h1>
+          </div>
+        ) : (
+          <h1 className="visually-hidden">Trámite en claro</h1>
+        )}
+
+        {isIdle && (
+          <SuggestedQuestions
+            title="Preguntas frecuentes"
+            questions={SUGGESTIONS}
+            onSelect={handleSuggestion}
+          />
+        )}
+
         <QuestionForm
           value={question}
           onChange={handleChange}
@@ -52,8 +89,13 @@ function App() {
           isLoading={isLoading}
           error={formError}
         />
-        {/* Temporal: muestra el resultado crudo. Se reemplaza en los siguientes pasos. */}
-        <pre>{JSON.stringify(result, null, 2)}</pre>
+
+        {/* aria-live: el lector de pantalla anuncia lo que aparece aquí (cargando, respuesta, errores). */}
+        <section className="result" aria-live="polite" aria-busy={isLoading}>
+          {isLoading && <LoadingState />}
+          {/* Temporal: los demás estados se muestran en crudo hasta el paso 7. */}
+          {!isIdle && !isLoading && <pre>{JSON.stringify(result, null, 2)}</pre>}
+        </section>
       </main>
     </>
   );
