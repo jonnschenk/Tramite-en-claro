@@ -1,0 +1,8 @@
+// Contenedor de la página: mismo ancho que el encabezado.
+@use 'tokens' as *;
+
+.page {
+  width: $container-width;
+  margin-inline: auto;
+  padding-block: 24px;
+}

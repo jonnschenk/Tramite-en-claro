@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { askQuestion } from './api/ask.js';
+import Header from './components/Header.jsx';
+import Notice from './components/Notice.jsx';
 
-// Pantalla temporal: prueba askQuestion con los mocks.
 function App() {
   const [result, setResult] = useState(null);
 
@@ -11,11 +12,15 @@ function App() {
   }
 
   return (
-    <main>
-      <h1>Trámite en claro</h1>
-      <button onClick={handleClick}>Probar</button>
-      <pre>{JSON.stringify(result, null, 2)}</pre>
-    </main>
+    <>
+      <Header />
+      <main className="page">
+        <Notice />
+        {/* Temporal: prueba de askQuestion. Se reemplaza en los siguientes pasos. */}
+        <button onClick={handleClick}>Probar</button>
+        <pre>{JSON.stringify(result, null, 2)}</pre>
+      </main>
+    </>
   );
 }
 
