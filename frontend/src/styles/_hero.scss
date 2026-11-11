@@ -1,0 +1,15 @@
+// Bloque BEM: hero (título del inicio)
+@use 'tokens' as *;
+@use 'mixins' as *;
+
+.hero {
+  &__title {
+    font-size: clamp(2rem, 8vw, 3.25rem);
+    font-weight: 800;
+    letter-spacing: $tracking-title-tight;
+  }
+
+  &__dot {
+    color: $color-accent;
+  }
+}

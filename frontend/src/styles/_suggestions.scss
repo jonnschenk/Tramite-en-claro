@@ -1,0 +1,41 @@
+// Bloque BEM: suggestions (preguntas sugeridas en píldoras)
+@use 'tokens' as *;
+@use 'mixins' as *;
+
+.suggestions {
+  &__title {
+    @include eyebrow;
+    margin-bottom: 8px;
+    color: $color-text-secondary;
+  }
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__pill {
+    min-height: $touch-target;
+    padding: 10px 16px;
+    background: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-pill;
+    color: $color-text;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      border-color: $color-accent;
+      color: $color-accent-hover;
+    }
+
+    &:disabled {
+      color: $color-text-secondary;
+      cursor: progress;
+    }
+  }
+}
