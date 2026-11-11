@@ -12,6 +12,8 @@ Es un sistema RAG (generación aumentada por recuperación):
 2. **Cada pregunta:** frontend → `POST /ask` (Express) → embedding de la pregunta → similitud coseno contra el índice → si pasa el umbral, el modelo redacta la respuesta solo con los fragmentos → JSON con respuesta, pasos y fuentes.
 3. **Evals:** preguntas de prueba que pasan por el mismo `POST /ask` y miden respuesta correcta, fuente correcta y rechazo de preguntas fuera de tema.
 
+El contrato completo de `POST /ask` (petición, respuestas y errores) está en [docs/api-contract.md](docs/api-contract.md).
+
 ## Stack
 
 | Capa | Tecnología |
