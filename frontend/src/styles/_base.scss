@@ -1,0 +1,64 @@
+// Estilos base: reinicio mínimo y valores por defecto de la página.
+@use 'tokens' as *;
+@use 'mixins' as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: $color-bg;
+  color: $color-text;
+  font-family: $font-family;
+  font-size: $font-size-body;
+  line-height: $line-height-body;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.15;
+  letter-spacing: $tracking-title;
+}
+
+a {
+  color: $color-accent;
+
+  &:hover {
+    color: $color-accent-hover;
+  }
+}
+
+:focus-visible {
+  @include focus-ring;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+// Oculta texto a la vista, pero no al lector de pantalla.
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
