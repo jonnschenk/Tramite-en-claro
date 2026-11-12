@@ -10,6 +10,8 @@
 import express from 'express';
 import cors from 'cors';
 import { rateLimit } from 'express-rate-limit';
+import { answerQuestion } from './rag/answer.js';
+import { UpstreamError } from './errors.js';
 
 // ---------- Configuración ----------
 
@@ -92,13 +94,8 @@ function validateQuestion(req, res, next) {
 
 // 6. POST /ask
 app.post('/ask', askLimiter, readJson, validateQuestion, async (req, res) => {
-  // TEMPORAL: aquí va el RAG (embedding → similitud → modelo) en el siguiente paso.
-  // Por ahora responde "no_info" para probar la conexión con el frontend.
-  res.json({
-    status: 'no_info',
-    message: `(Temporal) Recibí tu pregunta: "${req.question}". El RAG todavía no está conectado.`,
-    officialUrl: 'https://www.cdmx.gob.mx/',
-  });
+  const answer = await answerQuestion(req.question);
+  res.json(answer);
 });
 
 // 7. Ruta que no existe → 404 con la forma del contrato.
@@ -120,6 +117,9 @@ app.use((err, req, res, next) => {
   }
 
   console.error(err); // el detalle se queda en el servidor, nunca se manda al usuario
+  if (err instanceof UpstreamError) {
+    return sendError(res, 502, 'UPSTREAM_ERROR', 'No pudimos consultar el servicio. Intenta de nuevo.');
+  }
   sendError(res, 500, 'INTERNAL_ERROR', 'Ocurrió un error inesperado.');
 });
 
