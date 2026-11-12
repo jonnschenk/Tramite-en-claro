@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "engines": { "node": ">=20" },
-  "scripts": {
-    "smoke": "node --env-file=.env scripts/smoke-test.js"
+    "scripts": {
+    "smoke": "node --env-file=.env scripts/smoke-test.js",
+    "ingest": "node --env-file=.env scripts/ingest.js",
+    "ingest:dry": "node scripts/ingest.js --dry-run"
   }
 }
