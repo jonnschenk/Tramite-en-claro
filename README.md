@@ -4,6 +4,8 @@ Asistente que responde dudas sobre cómo sacar un acta de nacimiento en la Ciuda
 
 > **Herramienta independiente. No es un sitio oficial. Verifica siempre en el canal oficial.**
 
+**Demo:** [jonnschenk.github.io/Tramite-en-claro](https://jonnschenk.github.io/Tramite-en-claro/). La primera pregunta puede tardar hasta un minuto mientras el servidor despierta.
+
 ## Cómo funciona
 
 Es un RAG (generación aumentada por recuperación):
@@ -21,7 +23,7 @@ El contrato de `POST /ask` está en [docs/api-contract.md](docs/api-contract.md)
 - **Embeddings:** Voyage AI (`voyage-4`)
 - **Modelo:** DeepSeek `deepseek-v4.1-flash` vía OpenRouter, con Claude `claude-haiku-5-5` como alternativa
 - **Índice:** archivo JSON + similitud coseno
-- **Deploy:** Render o Railway (API) y Firebase Hosting (frontend)
+- **Deploy:** Render (API) y GitHub Pages con GitHub Actions (frontend)
 
 ## Decisiones
 
@@ -100,6 +102,29 @@ El contrato de `POST /ask` está en [docs/api-contract.md](docs/api-contract.md)
 - **El dato clave se revisa con texto (sin acentos y con alternativas), no con otro LLM como juez.** Es más simple y siempre da el mismo resultado.
 - **Las métricas de calidad van aparte de "Pasan todo".** Una respuesta con un paso de más sigue siendo correcta; separarlas deja ver los dos tipos de problema sin mezclarlos.
 
+### Despliegue
+
+**Backend en Render**
+
+- **Plan gratis, no Render Starter (7 USD/mes) ni Railway.** Para una demo de portafolio alcanza; el arranque en frío lo resuelvo desde el frontend.
+- **Root Directory `backend`.** El repo tiene dos proyectos, y así Render solo despliega cuando cambia `backend/`.
+- **Build con `npm ci`, no `npm install` ni `yarn`** (el valor por defecto de Render). Instala exactamente las versiones de `package-lock.json`.
+- **`PORT` no se define en Render.** Render asigna su propio puerto y `server.js` lo lee de `process.env.PORT`.
+- **`CORS_ORIGIN` con dos orígenes:** GitHub Pages y `localhost:5173`, no `*`. CORS compara solo el origen, sin la ruta, y con localhost puedo probar contra Render.
+- **Voyage sin método de pago por ahora.** Cero riesgo de cobro, con un límite conocido: 3 preguntas por minuto entre todos. Por eso el límite propio se queda en 10 por minuto por IP: Voyage frena antes.
+
+**Despertar el servidor**
+
+- **Al abrir la página, el frontend llama a `GET /health` para despertar a Render.** No uso un ping cada 10 minutos para que nunca se duerma: gasta horas gratis y esconde el problema. Así solo actúa cuando alguien visita.
+- **`/ask` espera a que termine el despertar (hasta 90 s) y luego cuenta sus 30 s.** La pantalla dice "Despertando el servidor…", así que la primera pregunta no termina en error y la persona sabe por qué tarda.
+- **Una sola llamada a `/health` por visita (`??=`).** Una vez despierto no hace falta repetirla, y `StrictMode` tampoco la duplica.
+
+**Frontend en GitHub Pages**
+
+- **GitHub Pages con GitHub Actions, no Firebase Hosting.** Firebase no me dejó crear otro proyecto (límite de mi cuenta) y un segundo sitio dentro del de mi portafolio podía sobrescribirlo. Pages se publica solo con cada push y deja el código y la demo juntos.
+- **`base: '/Tramite-en-claro/'` solo al compilar.** Sin `base` la página sale en blanco porque busca el JS y el CSS en la raíz; en `npm run dev` sigue en `/`.
+- **Las variables `VITE_` van escritas en el workflow, no en GitHub Secrets.** No son secretas, porque terminan en el navegador. Las llaves solo existen en Render.
+
 ## Errores y aprendizajes
 
 - **`npm create vite` se canceló solo:** pegué varios comandos juntos y los siguientes le llegaron como respuestas al asistente. Ahora los corro uno por uno.
@@ -115,6 +140,13 @@ El contrato de `POST /ask` está en [docs/api-contract.md](docs/api-contract.md)
 - **Push rechazado y conflicto en `server.js`:** se subió una limpieza desde otra copia del repo mientras yo seguía trabajando en la mía. Lo resolví con `git pull --no-rebase` y quedándome con la versión correcta del archivo.
 - **`fg: no current job`:** copié el prompt `backend %` junto con el comando.
 - **GitHub rechazó un push (GH007)** porque exponía mi correo privado. Ahora uso el correo noreply de GitHub.
+- **El formulario de Render venía con el plan de 7 USD, `yarn` y sin Root Directory:** son los valores por defecto de Render, no los de mi proyecto. Revisé cada campo antes de desplegar.
+- **"Add from .env" metió `PORT` y una `ANTHROPIC_API_KEY` vacía en Render:** copia el archivo completo. Borré esas filas.
+- **Render instaló Node 26:** `"engines": ">=20"` pide la versión más nueva. Lo fijé en `24.x`, la misma que uso en mi computadora.
+- **Firebase: "Alcanzaste el límite de proyectos":** por eso cambié a GitHub Pages.
+- **`//Necesito estudiar "aria live"` se veía en la página publicada:** dentro del `return` estoy en JSX, donde `//` es texto y React lo muestra. En JSX los comentarios van en `{/* … */}`.
+- **Safari no encontraba "jonnschenk.github.io,http":** pegué el valor de `CORS_ORIGIN` en la barra de direcciones. Es configuración del backend, no la URL de la app.
+- **"CORS permitido para…" aparecía varias veces en los logs de Render:** no es un error. Cada arranque en frío vuelve a correr `server.js` desde cero, y es la prueba visible de que el servidor se duerme y despierta.
 
 ## Fuentes oficiales del corpus
 
@@ -192,12 +224,17 @@ npm run dev            # abre http://localhost:5173
 
 La corrida 1 usó `EVAL_DELAY_MS=21000` por el límite de Voyage sin método de pago. El detalle completo está en `backend/evals/results/`.
 
+## Límites conocidos
+
+- **Arranque en frío.** Render en plan gratis duerme el servidor después de 15 minutos sin uso. El frontend lo despierta al abrir la página y muestra "Despertando el servidor…", pero la primera respuesta puede tardar.
+- **3 preguntas por minuto entre todos.** Es el límite de Voyage sin método de pago. Si varias personas usan la demo al mismo tiempo, algunas preguntas van a fallar con 502.
+- **Solo cubre el acta de nacimiento en la Ciudad de México,** con 10 fuentes consultadas el 2026-11-10. Si un trámite cambia después de esa fecha, la herramienta no lo sabe.
+- **Los evals se ajustaron sobre las mismas 20 preguntas** (ver [Resultados de evals](#resultados-de-evals)).
+
 ## Próximos pasos
 
 - Escribir un set de preguntas nuevo, que no haya usado para ajustar el prompt, y correr los evals contra él.
 - Agregar método de pago en Voyage: 3 peticiones por minuto no alcanzan para una demo pública.
-- Desplegar el backend en Render con `CORS_ORIGIN` apuntando al dominio de Firebase.
-
 ## Cómo uso IA en este proyecto
 
 Uso Claude Code como par de programación. Yo decido qué se construye y por qué; la IA me ayuda con el cómo, y nada entra al repo sin que yo lo revise y lo pruebe.
@@ -216,3 +253,5 @@ Uso Claude Code como par de programación. Yo decido qué se construye y por qu�
 ## Créditos
 
 Pendiente de completar al cierre. Debe decir con honestidad qué escribí yo, qué generé con ayuda de Claude y Claude Code, y qué librerías usé.
+
+**Fase 4 (despliegue):** el código del despertar, el workflow de GitHub Actions y el cambio en `vite.config.js` los generó Claude; yo los integré, los probé en producción y decidí las plataformas. La configuración de Render y GitHub Pages la hice yo en sus paneles, con guía de Claude. El comentario JSX que se veía en la página lo encontré yo.
