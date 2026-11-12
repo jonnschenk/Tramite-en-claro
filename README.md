@@ -81,6 +81,9 @@ El contrato de `POST /ask` está en [docs/api-contract.md](docs/api-contract.md)
 - **El modelo cita números de fragmento, no URLs.** Así no puede inventar enlaces. Las citas inválidas se ignoran, los pasos sin cita no se muestran y si el resumen no tiene cita la respuesta pasa a `no_info`.
 - **El modelo decide `no_info` con `found: false`.** En ese caso `officialUrl` apunta a la fuente más parecida a la pregunta.
 - **Si el modelo no responde JSON válido, es un 502.** La falla es del servicio, no de la pregunta.
+- **Pasos solo cuando la pregunta pide cómo hacer algo.** Si pregunta un dato (costo, horario, vigencia), la respuesta va sin pasos. Cada paso empieza con un verbo y es una acción real, no relleno.
+- **Sin comillas dobles dentro de los textos** (se usan « »). Era la causa más probable del 502 de q07, que desapareció con esta regla.
+- **`cleanText` como red de seguridad:** si el modelo escribe `[3]` dentro del texto, se quita. Es un número de fragmento, no de fuente, y en pantalla se confundiría con las citas reales.
 - **`temperature: 0`** para que los evals sean reproducibles.
 - **Proveedor intercambiable con `LLM_PROVIDER`** (OpenRouter o Anthropic), sin tocar código.
 - **Tiempos: 10 s para Voyage + 18 s para el modelo,** para que todo quepa en los 30 s que espera el frontend.
@@ -95,6 +98,7 @@ El contrato de `POST /ask` está en [docs/api-contract.md](docs/api-contract.md)
 
 - **Los evals llaman al mismo `POST /ask` por HTTP** que usa la pantalla, así prueban el sistema completo.
 - **El dato clave se revisa con texto (sin acentos y con alternativas), no con otro LLM como juez.** Es más simple y siempre da el mismo resultado.
+- **Las métricas de calidad van aparte de "Pasan todo".** Una respuesta con un paso de más sigue siendo correcta; separarlas deja ver los dos tipos de problema sin mezclarlos.
 
 ## Errores y aprendizajes
 
@@ -161,24 +165,36 @@ npm run dev            # abre http://localhost:5173
 
 20 preguntas en `backend/evals/questions.json`: 12 con respuesta, 3 sin información y 5 fuera de tema (una es un intento de prompt injection).
 
-**Corrida 1 (línea base, 12 de noviembre de 2026)**
+| Métrica | Corrida 1 | Corrida 2 |
+|---|---|---|
+| Pasan todo | 95% (19/20) | **100% (20/20)** |
+| Status correcto | 95% (19/20) | **100% (20/20)** |
+| Cita una fuente correcta | 92% (11/12) | **100% (12/12)** |
+| Trae el dato clave | 92% (11/12) | **100% (12/12)** |
+| Se niega cuando debe | 100% (8/8) | 100% (8/8) |
+| Calidad: sin pasos de más | 71% (5/7) | **100% (7/7)** |
+| Calidad: sin marcas [n] en el texto | 82% (9/11) | 100% (12/12) |
+| Errores | 1 (q07) | **0** |
+| Tiempo promedio | 2.4 s | 2.0 s |
 
-| Métrica | Resultado |
-|---|---|
-| Pasan todo | 95% (19/20) |
-| Status correcto | 95% (19/20) |
-| Cita una fuente correcta | 92% (11/12) |
-| Trae el dato clave | 92% (11/12) |
-| Se niega cuando debe | 100% (8/8) |
-| Errores | 1 (q07) |
-| Tiempo promedio | 2.4 s |
+**Corrida 1 (línea base).** La única falla fue q07 (Velásquez/Velázquez): un 502 a los 7.3 s, probablemente por comillas sin escapar dentro del JSON del modelo. Al revisar las respuestas también vi dos problemas que los evals no medían: pasos de relleno en preguntas que solo piden un dato, y marcas como `[3]` dentro del texto. Las métricas de calidad de esta corrida las calculé después, con las respuestas guardadas.
 
-La única falla es q07 (Velásquez/Velázquez), que respondió 502 a los 7.3 s. Sospecho que el modelo devuelve comillas sin escapar dentro del JSON; falta confirmarlo en el log. La corrida usó `EVAL_DELAY_MS=21000` por el límite de Voyage sin método de pago. El detalle completo está en `backend/evals/results/`.
+**Qué cambié para la corrida 2:**
+
+- **Reglas nuevas en el prompt:** usar pasos solo cuando la pregunta pide cómo hacer algo; cada paso empieza con un verbo y es una acción real; no usar comillas dobles dentro de los textos; no escribir números de fragmento en el texto.
+- **`cleanText` en el backend** como red de seguridad: si el modelo escribe `[3]` de todos modos, se quita antes de responder.
+- **Dos métricas de calidad nuevas en los evals.** Las 7 preguntas de un solo dato (costo, horario, vigencia…) llevan `"steps": false` en `questions.json`. Estas métricas no cuentan para "Pasan todo".
+
+**Cómo leer estos resultados:**
+
+- **Ajusté el prompt viendo las respuestas de estas mismas 20 preguntas.** El 100% no garantiza lo mismo con preguntas nuevas. Para comprobarlo necesito un segundo set de preguntas que no haya usado para ajustar.
+- **"Sin marcas [n]" en la corrida 2 mide la red de seguridad, no al modelo.** `cleanText` quita las marcas antes de que lleguen al eval, así que ese 100% no dice si el prompt por sí solo lo resolvió.
+
+La corrida 1 usó `EVAL_DELAY_MS=21000` por el límite de Voyage sin método de pago. El detalle completo está en `backend/evals/results/`.
 
 ## Próximos pasos
 
-- Corregir q07 y volver a correr los evals para comparar con la corrida 1.
-- Mejorar los pasos: a veces agrega un paso de relleno o pone pasos cuando la pregunta solo pide un dato (como el costo). Los evals todavía no miden esto.
+- Escribir un set de preguntas nuevo, que no haya usado para ajustar el prompt, y correr los evals contra él.
 - Agregar método de pago en Voyage: 3 peticiones por minuto no alcanzan para una demo pública.
 - Desplegar el backend en Render con `CORS_ORIGIN` apuntando al dominio de Firebase.
 
