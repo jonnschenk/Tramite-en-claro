@@ -1,4 +1,4 @@
-function SuggestedQuestions({ title, questions, onSelect, disabled }) {
+function SuggestedQuestions({ title, questions, onSelect }) {
   return (
     <section className="suggestions" aria-labelledby="suggestions-title">
       <h2 className="suggestions__title" id="suggestions-title">
@@ -7,12 +7,7 @@ function SuggestedQuestions({ title, questions, onSelect, disabled }) {
       <ul className="suggestions__list">
         {questions.map((question) => (
           <li key={question}>
-            <button
-              className="suggestions__pill"
-              type="button"
-              onClick={() => onSelect(question)}
-              disabled={disabled}
-            >
+            <button className="suggestions__pill" type="button" onClick={() => onSelect(question)}>
               {question}
             </button>
           </li>

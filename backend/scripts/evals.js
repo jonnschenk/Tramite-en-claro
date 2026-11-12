@@ -1,4 +1,5 @@
-// Manda cada pregunta de evals/questions.json a POST /ask y revisa el status, la fuente citada y el dato clave. Además mide dos cosas de calidad: pasos de más en preguntas de un solo dato y marcas como [3] dentro del texto.
+// Manda cada pregunta de evals/questions.json a POST /ask y revisa el status, la fuente citada y el dato clave.
+// Además mide la calidad: pasos de más en preguntas de un solo dato y marcas como [3] dentro del texto.
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 
