@@ -11,7 +11,8 @@
       "start": "node src/server.js",
       "smoke": "node --env-file=.env scripts/smoke-test.js",
       "ingest": "node --env-file=.env scripts/ingest.js",
-      "ingest:dry": "node scripts/ingest.js --dry-run"
+      "ingest:dry": "node scripts/ingest.js --dry-run",
+    "similarity": "node --env-file=.env scripts/similarity.js"
     },
 
   "dependencies": {
