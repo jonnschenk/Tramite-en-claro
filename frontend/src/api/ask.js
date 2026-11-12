@@ -87,8 +87,8 @@ export async function askQuestion(question) {
   };
 }
 
-// Modo mock: ?mock=answered|noInfo|offTopic|rateLimited|upstream|internal|network y ?delay=ms (1200 por defecto). Regresa un Response real para que los mocks
-// pasen por el mismo manejo que la API.
+// Modo mock: ?mock=answered|noInfo|offTopic|rateLimited|upstream|internal|network y ?delay=ms (1200 por defecto).
+// Regresa un Response real para que los mocks pasen por el mismo manejo que la API.
 async function fakeFetch() {
   const params = new URLSearchParams(window.location.search);
   const scenario = params.get('mock') || 'answered';
