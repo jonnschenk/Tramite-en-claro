@@ -88,10 +88,11 @@ app.use((err, req, res, next) => {
     });
   }
 
-  console.error(err);
   if (err instanceof UpstreamError) {
+    console.error(err.message);
     return sendError(res, 502, 'UPSTREAM_ERROR', 'No pudimos consultar el servicio. Intenta de nuevo.');
   }
+  console.error(err);
   sendError(res, 500, 'INTERNAL_ERROR', 'Ocurrió un error inesperado.');
 });
 
