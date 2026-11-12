@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { askQuestion, validateQuestion } from './api/ask.js';
+import { useEffect, useRef, useState } from 'react';
+import { askQuestion, validateQuestion, wakeUpServer } from './api/ask.js';
 import Header from './components/Header.jsx';
 import Notice from './components/Notice.jsx';
 import QuestionForm from './components/QuestionForm.jsx';
@@ -23,7 +23,13 @@ function App() {
   const [question, setQuestion] = useState('');
   const [formError, setFormError] = useState(null);
   const [result, setResult] = useState(null);
+  const [serverAwake, setServerAwake] = useState(false);
   const lastQuestion = useRef(''); // la última pregunta enviada, para "Reintentar"
+
+  // Al abrir la página despertamos al servidor mientras la persona escribe.
+  useEffect(() => {
+    wakeUpServer().then(() => setServerAwake(true));
+  }, []);
 
   const isIdle = result === null;
   const isLoading = result?.state === 'loading';
@@ -100,10 +106,10 @@ function App() {
         </div>
 
         {isIdle && <HowItWorks />}
-
+//Necesito estudiar "aria live"
         {/* aria-live: el lector de pantalla anuncia lo que aparece aquí (cargando, respuesta, errores). */}
         <section className="result" aria-live="polite" aria-busy={isLoading}>
-          {isLoading && <LoadingState />}
+          {isLoading && <LoadingState isWaking={!serverAwake} />}
           {result?.state === 'answered' && <AnswerView data={result.data} />}
           {result?.state === 'no_info' && <NoInfoState data={result.data} />}
           {result?.state === 'off_topic' && (
