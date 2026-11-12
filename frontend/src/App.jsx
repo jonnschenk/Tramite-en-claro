@@ -106,7 +106,6 @@ function App() {
         </div>
 
         {isIdle && <HowItWorks />}
-//Necesito estudiar "aria live"
         {/* aria-live: el lector de pantalla anuncia lo que aparece aquí (cargando, respuesta, errores). */}
         <section className="result" aria-live="polite" aria-busy={isLoading}>
           {isLoading && <LoadingState isWaking={!serverAwake} />}
