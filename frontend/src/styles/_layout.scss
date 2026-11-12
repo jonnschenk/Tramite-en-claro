@@ -1,10 +1,59 @@
-
+// Layout de la página (mobile-first).
+// Móvil: la barra de pregunta va fija abajo, al alcance del pulgar.
+// Web: en el inicio, columna centrada de 760 px; después de preguntar, ancho completo y la barra se queda arriba como un buscador.
 @use 'tokens' as *;
+@use 'mixins' as *;
+
+$ask-bar-space: 200px; // espacio para que la barra fija no tape el final de la página sticky vs fixed 
 
 .page {
   width: $container-width;
   margin-inline: auto;
-  padding-block: 24px;
+  padding-top: 24px;
+  padding-bottom: calc(#{$ask-bar-space} + env(safe-area-inset-bottom));
   display: grid;
   gap: 16px;
+
+  @include web {
+    padding-bottom: 64px;
+    gap: 24px;
+  }
+
+  &--idle {
+    @include web {
+      width: min(92%, $home-column-max);
+      padding-top: 48px;
+    }
+  }
+}
+
+.ask-bar {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 10;
+  padding: 12px 4% calc(12px + env(safe-area-inset-bottom));
+  @include glass;
+  border-width: 1px 0 0;
+
+  @include web {
+    position: static;
+    padding: 0;
+    background: none;
+    border: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  // Web, después de preguntar: la barra se queda arriba, debajo del encabezado.
+  &--docked {
+    @include web {
+      position: sticky;
+      top: 76px;
+      padding: 12px;
+      margin-inline: -12px;
+      border-radius: $radius-card-web;
+      @include glass;
+    }
+  }
 }
