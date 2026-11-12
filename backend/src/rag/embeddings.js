@@ -1,5 +1,5 @@
-// Convierte la pregunta del usuario en un embedding con Voyage.
-// Es la misma llamada de ingest.js, pero con input_type "query", los fragmentos se guardaron como "document" y las preguntas van como "query".
+// Igual que en ingest.js, pero con input_type "query": Voyage optimiza distinto
+// las preguntas y los fragmentos (que se guardaron como "document").
 
 import { UpstreamError } from '../errors.js';
 
@@ -25,7 +25,6 @@ export async function embedQuery(question) {
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
   } catch (err) {
-    // Sin red o pasaron los 10 s.
     throw new UpstreamError('Voyage', err.message);
   }
 

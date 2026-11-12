@@ -1,8 +1,4 @@
-// Prueba rápida: confirma que las llaves funcionan.
-// No es parte de la app; solo sirve para saber el primer día si algo falla.
-//
-// Prueba siempre Voyage (embeddings) y después el modelo que redacta,
-// según LLM_PROVIDER en .env: "openrouter" (DeepSeek) o "anthropic" (Claude).
+// Revisa que las llaves de .env funcionen: Voyage y el modelo de LLM_PROVIDER.
 
 const env = process.env;
 const LLM_PROVIDER = env.LLM_PROVIDER || 'openrouter';
@@ -16,7 +12,6 @@ function fail(msg) {
   process.exit(1);
 }
 
-// 1. Voyage: convierte una pregunta en un embedding (lista de números).
 async function testVoyage() {
   if (!env.VOYAGE_API_KEY) fail('Falta VOYAGE_API_KEY en .env');
 
@@ -39,7 +34,6 @@ async function testVoyage() {
   console.log(`Voyage OK: el embedding tiene ${data.data[0].embedding.length} números.`);
 }
 
-// 2a. OpenRouter (DeepSeek): usa el formato de chat de OpenAI.
 async function testOpenRouter() {
   if (!env.OPENROUTER_API_KEY) fail('Falta OPENROUTER_API_KEY en .env');
 
@@ -62,7 +56,6 @@ async function testOpenRouter() {
   console.log('DeepSeek respondió:', data.choices[0].message.content);
 }
 
-// 2b. Claude: usa el formato de mensajes de Anthropic.
 async function testAnthropic() {
   if (!env.ANTHROPIC_API_KEY) fail('Falta ANTHROPIC_API_KEY en .env');
 

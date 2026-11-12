@@ -1,6 +1,5 @@
 import { formatDate } from '../utils/formatDate.js';
 
-// Lista de fuentes: número, dominio, título (enlace) y fecha de consulta.
 function SourceList({ sources }) {
   return (
     <aside className="card sources" aria-labelledby="sources-title">

@@ -1,6 +1,4 @@
-// Respuestas falsas (mocks) que siguen docs/api-contract.md.
-// Sirven para construir y probar la pantalla antes de que exista el backend.
-// Los textos son ilustrativos: los reales saldrán del corpus.
+// Mocks de docs/api-contract.md. Los textos son de ejemplo, no del corpus.
 
 // Respuestas 200: el sistema funcionó y "status" dice qué estado mostrar.
 export const mockResponses = {

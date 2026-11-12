@@ -1,6 +1,3 @@
-// Búsqueda: compara el embedding de la pregunta contra todos los fragmentos
-// de data/index.json y regresa los más parecidos.
-
 import { readFileSync } from 'node:fs';
 
 const INDEX_URL = new URL('../../data/index.json', import.meta.url);
@@ -16,7 +13,7 @@ function loadIndex() {
 
   const queryModel = process.env.VOYAGE_MODEL || 'voyage-4';
   if (index.model !== queryModel) {
-    // Vectores de modelos distintos no se pueden comparar entre sí.
+    // Vectores de modelos distintos no son comparables.
     throw new Error(`El índice se hizo con ${index.model}, pero VOYAGE_MODEL es ${queryModel}.`);
   }
   return index;
@@ -24,7 +21,6 @@ function loadIndex() {
 
 export const index = loadIndex();
 
-// Similitud coseno: qué tan parecida es la dirección de dos vectores. 1 = mismo significado, 0 = nada que ver.
 export function cosineSimilarity(a, b) {
   let dot = 0;
   let normA = 0;
@@ -37,7 +33,6 @@ export function cosineSimilarity(a, b) {
   return dot / (Math.sqrt(normA) * Math.sqrt(normB));
 }
 
-// Calcula el puntaje de los 53 fragmentos, los ordena de mayor a menor y regresa los k mejores, cada uno con su fuente.
 export function search(queryVector, k = 5) {
   return index.chunks
     .map((chunk) => ({

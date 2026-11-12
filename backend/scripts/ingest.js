@@ -1,20 +1,10 @@
-// Preparación del índice (se corre una vez, o cada vez que cambian las fuentes).
-//
-// 1. Lee las fuentes oficiales de data/sources/*.md.
-// 2. Separa el frontmatter (datos de la fuente) del contenido.
-// 3. Corta el contenido en fragmentos: uno por sección "##" del documento.
-// 4. Pide a Voyage un embedding de cada fragmento (input_type: "document").
-// 5. Guarda todo en data/index.json.
-//
-// Uso:
-//   npm run ingest        → hace todo y llama a Voyage (necesita .env)
-//   npm run ingest:dry    → solo corta y muestra los fragmentos, sin llamar a Voyage
+// Genera data/index.json a partir de data/sources/*.md.
+// Correr de nuevo cada vez que cambien las fuentes.
+// --dry-run muestra los fragmentos sin llamar a Voyage.
 
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-// ---------- Configuración ----------
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCES_DIR = path.join(ROOT, 'data', 'sources');
@@ -38,11 +28,8 @@ function fail(msg) {
 
 const countWords = (text) => text.split(/\s+/).filter(Boolean).length;
 
-// ---------- 1 y 2. Leer cada fuente y separar el frontmatter ----------
-
-// El frontmatter es el bloque entre los dos primeros "---".
-// Cada línea es "campo: valor". Se corta en el primer ":" porque
-// las notas y las URL también pueden llevar ":".
+// Se corta cada línea en el primer ":" porque las notas y las URL
+// también pueden llevar ":".
 function parseSource(fileName, raw) {
   const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (!match) fail(`${fileName}: no tiene frontmatter entre "---".`);
@@ -62,7 +49,6 @@ function parseSource(fileName, raw) {
     fail(`${fileName}: "consultado" debe ser AAAA-MM-DD (tiene "${meta.consultado}").`);
   }
 
-  // Aquí se traducen los nombres del frontmatter (español) a los del contrato.
   const source = {
     id: meta.id,
     title: meta.titulo,
@@ -74,10 +60,7 @@ function parseSource(fileName, raw) {
   return { source, body };
 }
 
-// ---------- 3. Cortar en fragmentos ----------
-
-// Separa el cuerpo en secciones usando los títulos "## ".
-// El texto antes del primer "##" (intro) también cuenta como sección.
+// El texto antes del primer "##" también cuenta como sección.
 function splitSections(body) {
   const docTitle = body.match(/^# (.+)$/m)?.[1].trim() ?? '';
   const withoutTitle = body.replace(/^# .+$/m, '');
@@ -101,7 +84,6 @@ function splitSections(body) {
   return { docTitle, sections: clean };
 }
 
-// Una sección larga se parte en bloques (párrafos separados por línea vacía).
 // Las tablas se parten por filas y cada pedazo repite el encabezado,
 // para que cada fragmento se entienda solo.
 function splitLongText(text) {
@@ -117,7 +99,6 @@ function splitLongText(text) {
     }
   }
 
-  // Junta bloques en orden hasta llegar a MAX_WORDS.
   const pieces = [];
   let current = [];
   let words = 0;
@@ -141,7 +122,6 @@ function splitLongText(text) {
   return pieces;
 }
 
-// Arma los fragmentos de una fuente.
 // Cada fragmento empieza con "Título del documento — Sección" para que
 // el embedding sepa de qué trámite habla aunque el texto sea corto
 // (por ejemplo, una sección "Costo" que solo dice "Gratuito").
@@ -178,10 +158,7 @@ function chunkSource(source, body) {
   return chunks;
 }
 
-// ---------- 4. Embeddings con Voyage ----------
-
-// input_type "document": le dice a Voyage que esto es texto para guardar.
-// Las preguntas se embeben después con input_type "query" (en /ask).
+// Los fragmentos van como "document"; las preguntas, como "query" (en /ask).
 async function embedDocuments(texts) {
   if (!env.VOYAGE_API_KEY) fail('Falta VOYAGE_API_KEY en .env');
 
@@ -213,8 +190,6 @@ async function embedDocuments(texts) {
 
   return { vectors, totalTokens };
 }
-
-// ---------- Programa principal ----------
 
 const files = (await readdir(SOURCES_DIR)).filter((f) => f.endsWith('.md')).sort();
 if (!files.length) fail(`No hay archivos .md en ${SOURCES_DIR}`);

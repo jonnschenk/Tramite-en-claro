@@ -1,4 +1,3 @@
-// Preguntas sugeridas en píldoras. Se usan en el inicio y en "Fuera de tema".
 function SuggestedQuestions({ title, questions, onSelect, disabled }) {
   return (
     <section className="suggestions" aria-labelledby="suggestions-title">

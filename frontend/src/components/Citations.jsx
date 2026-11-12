@@ -1,4 +1,3 @@
-// Citas 1 y 2, que llevan a la fuente en la lista de fuentes.
 function Citations({ ids }) {
   if (!ids?.length) return null;
 

@@ -1,5 +1,3 @@
-// Encabezado con el logo (lupa + punto) y el nombre.
-// El SVG es decorativo (aria-hidden): el texto da el nombre accesible.
 function Header() {
   return (
     <header className="header">

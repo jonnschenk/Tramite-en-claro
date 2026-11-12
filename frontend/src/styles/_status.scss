@@ -49,7 +49,6 @@
     }
   }
 
-  // Sin información: gris azulado neutro, NO rojo.
   &--no-info {
     background: $color-noinfo-bg;
     border-color: $color-noinfo-border;
@@ -61,14 +60,12 @@
     }
   }
 
-  // Fuera de tema: tarjeta blanca normal con sugerencias.
   &--off-topic {
     .status__icon {
       color: $color-text-secondary;
     }
   }
 
-  // Error: arcilla.
   &--error {
     background: $color-error-bg;
     border-color: $color-error-border;

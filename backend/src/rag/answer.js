@@ -1,10 +1,3 @@
-// El corazón del RAG: de una pregunta a la respuesta del contrato. 
-// 1. Embedding de la pregunta (Voyage).
-// 2. Buscar los fragmentos más parecidos.
-// 3. Si ninguno pasa el umbral → off_topic, sin llamar al modelo.
-// 4. Si sí → el modelo responde SOLO con esos fragmentos y cita cuál usó.
-// 5. Traducir sus citas (fragmento 1, 2…) a las fuentes del contrato.
-
 import { embedQuery } from './embeddings.js';
 import { search } from './retrieve.js';
 import { callModel } from './llm.js';
@@ -29,8 +22,6 @@ const noInfo = (officialUrl) => ({
   officialUrl,
 });
 
-// Reglas del modelo 
-
 const SYSTEM_PROMPT = `Eres el asistente de "Trámite en claro". Ayudas con dudas sobre el acta de nacimiento en la Ciudad de México.
 
 Reglas:
@@ -52,8 +43,6 @@ function buildUserMessage(question, chunks) {
   return `${fragments}\n\n<pregunta>${question}</pregunta>`;
 }
 
-// Leer la respuesta del modelo
-
 function parseModelJson(text) {
   const start = text.indexOf('{');
   const end = text.lastIndexOf('}');
@@ -72,16 +61,16 @@ function parseModelJson(text) {
   return data;
 }
 
-// Del formato del modelo al formato del contrato 
-
+// El modelo cita "fragmento 1, 2…"; el contrato usa fuentes numeradas 1, 2…
+// en el orden en que aparecen. Varios fragmentos pueden venir de la misma fuente.
 function buildAnswer(data, chunks) {
-  const displayIds = new Map(); 
+  const displayIds = new Map();
 
   const toSourceIds = (fragments) => {
     const ids = [];
     for (const n of Array.isArray(fragments) ? fragments : []) {
       const chunk = chunks[Number(n) - 1];
-      if (!chunk) continue; 
+      if (!chunk) continue;
       if (!displayIds.has(chunk.source.id)) displayIds.set(chunk.source.id, displayIds.size + 1);
       const id = displayIds.get(chunk.source.id);
       if (!ids.includes(id)) ids.push(id);
@@ -111,17 +100,14 @@ function buildAnswer(data, chunks) {
     summary,
     steps,
     sources,
-    officialUrl: sources[0].url, 
+    officialUrl: sources[0].url,
   };
 }
-
-// Todo junto 
 
 export async function answerQuestion(question) {
   const vector = await embedQuery(question);
   const results = search(vector, TOP_K);
 
-  // Al modelo solo le llegan los fragmentos que pasan el umbral.
   const relevant = results.filter((r) => r.score >= THRESHOLD);
   if (relevant.length === 0) return OFF_TOPIC;
 
@@ -131,7 +117,6 @@ export async function answerQuestion(question) {
   });
   const data = parseModelJson(text);
 
-  // Si no hay respuesta, mandamos a la fuente más parecida a la pregunta.
   if (!data.found) return noInfo(relevant[0].source.url);
 
   return buildAnswer(data, relevant) ?? noInfo(relevant[0].source.url);
