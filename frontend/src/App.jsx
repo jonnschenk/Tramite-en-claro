@@ -5,6 +5,7 @@ import Notice from './components/Notice.jsx';
 import QuestionForm from './components/QuestionForm.jsx';
 import SuggestedQuestions from './components/SuggestedQuestions.jsx';
 import LoadingState from './components/LoadingState.jsx';
+import AnswerView from './components/AnswerView.jsx';
 
 // Preguntas que el corpus sí cubre (fuentes 01, 02, 05 y 06).
 const SUGGESTIONS = [
@@ -91,10 +92,13 @@ function App() {
         />
 
         {/* aria-live: el lector de pantalla anuncia lo que aparece aquí (cargando, respuesta, errores). */}
-        <section className="result" aria-live="polite" aria-busy={isLoading}>
+               <section className="result" aria-live="polite" aria-busy={isLoading}>
           {isLoading && <LoadingState />}
-          {/* Temporal: los demás estados se muestran en crudo hasta el paso 7. */}
-          {!isIdle && !isLoading && <pre>{JSON.stringify(result, null, 2)}</pre>}
+          {result?.state === 'answered' && <AnswerView data={result.data} />}
+          {/* Temporal: no_info, off_topic y error se muestran en crudo hasta el paso 8. */}
+          {['no_info', 'off_topic', 'error'].includes(result?.state) && (
+            <pre>{JSON.stringify(result, null, 2)}</pre>
+          )}
         </section>
       </main>
     </>

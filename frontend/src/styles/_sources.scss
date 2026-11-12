@@ -1,0 +1,48 @@
+@use 'tokens' as *;
+@use 'mixins' as *;
+
+.sources {
+  &__title {
+    @include eyebrow;
+    margin-bottom: 12px;
+    color: $color-text-secondary;
+  }
+
+  &__list {
+    display: grid;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    scroll-margin-top: 88px; 
+  }
+
+  &__number {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border-radius: $radius-pill;
+    background: $color-fill-soft;
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  &__domain,
+  &__date {
+    margin: 0;
+    color: $color-text-secondary;
+    font-size: 0.875rem;
+  }
+
+  &__link {
+    font-weight: 600;
+  }
+}
