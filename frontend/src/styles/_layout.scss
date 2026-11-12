@@ -1,10 +1,7 @@
-// Layout de la página (mobile-first).
-// Móvil: la barra de pregunta va fija abajo, al alcance del pulgar.
-// Web: en el inicio, columna centrada de 760 px; después de preguntar, ancho completo y la barra se queda arriba como un buscador.
 @use 'tokens' as *;
 @use 'mixins' as *;
 
-$ask-bar-space: 200px; // espacio para que la barra fija no tape el final de la página sticky vs fixed 
+$ask-bar-space: 200px;
 
 .page {
   width: $container-width;
@@ -45,7 +42,6 @@ $ask-bar-space: 200px; // espacio para que la barra fija no tape el final de la 
     backdrop-filter: none;
   }
 
-  // Web, después de preguntar: la barra se queda arriba, debajo del encabezado.
   &--docked {
     @include web {
       position: sticky;

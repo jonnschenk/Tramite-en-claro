@@ -1,4 +1,3 @@
-// Aviso fijo: se ve antes de preguntar.
 function Notice() {
   return (
     <p className="notice" role="note">

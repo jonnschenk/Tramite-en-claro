@@ -1,4 +1,3 @@
-// Sección "Cómo funciona" (solo en el inicio de web): explica de dónde sale la información.
 const STEPS = [
   {
     title: 'Busca en fuentes oficiales',

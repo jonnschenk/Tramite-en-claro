@@ -1,8 +1,6 @@
-// Bloques BEM: answer-layout, answer y citations (estado 3 · Respuesta)
 @use 'tokens' as *;
 @use 'mixins' as *;
 
-// Respuesta y fuentes lado a lado en web; en pantallas angostas las fuentes bajan solas.
 .answer-layout {
   display: flex;
   flex-wrap: wrap;

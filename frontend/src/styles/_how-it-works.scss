@@ -1,9 +1,8 @@
-// Bloque BEM: how (sección "Cómo funciona", solo web)
 @use 'tokens' as *;
 @use 'mixins' as *;
 
 .how {
-  display: none; // en móvil no se muestra: la pantalla es para preguntar
+  display: none;
 
   @include web {
     display: block;

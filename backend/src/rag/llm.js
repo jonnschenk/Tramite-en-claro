@@ -1,9 +1,6 @@
-// La única función que habla con el modelo de lenguaje.
-// Cambiar de proveedor es solo cambiar LLM_PROVIDER en .env: "openrouter" (DeepSeek) o "anthropic" (Claude).
-
 import { UpstreamError } from '../errors.js';
 
-const TIMEOUT_MS = 18_000; 
+const TIMEOUT_MS = 18_000; // Voyage (10 s) + modelo (18 s) caben en los 30 s del frontend
 const MAX_TOKENS = 1200;
 
 export async function callModel({ system, user }) {
@@ -29,8 +26,6 @@ async function post(service, url, headers, body) {
   return res.json();
 }
 
-// OpenRouter usa el formato de chat de OpenAI: las reglas van como mensaje "system".
-
 async function callOpenRouter(system, user) {
   const env = process.env;
   const data = await post(
@@ -40,7 +35,7 @@ async function callOpenRouter(system, user) {
     {
       model: env.OPENROUTER_MODEL || 'deepseek/deepseek-v4.1-flash',
       max_tokens: MAX_TOKENS,
-      temperature: 0, 
+      temperature: 0,
       messages: [
         { role: 'system', content: system },
         { role: 'user', content: user },
@@ -50,7 +45,6 @@ async function callOpenRouter(system, user) {
   return data.choices?.[0]?.message?.content ?? '';
 }
 
-// Anthropic usa su formato de mensajes: las reglas van en el campo "system".
 async function callAnthropic(system, user) {
   const env = process.env;
   const data = await post(

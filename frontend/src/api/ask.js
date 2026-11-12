@@ -1,15 +1,11 @@
-// Única puerta del frontend hacia POST /ask (ver docs/api-contract.md).
-// Convierte cualquier respuesta (o falla) en uno de los estados de la pantalla.
-
 import { mockResponses, mockErrors } from '../mocks/ask-responses.js';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
-export const MAX_LENGTH = 500;
+export const MAX_LENGTH = 500; // mismo límite que el backend
 const TIMEOUT_MS = 30_000;
 
-// 1. Validación en el frontend: misma regla que el backend, pero sin gastar una llamada.
 export function validateQuestion(question) {
   const clean = question.trim();
   if (clean.length === 0) {
@@ -24,8 +20,8 @@ export function validateQuestion(question) {
   return null;
 }
 
-// 2. Pide la respuesta y devuelve siempre un objeto { state, ... }.
-//    state: 'answered' | 'no_info' | 'off_topic' | 'invalid' | 'error'
+// Nunca lanza: siempre regresa { state } con
+// 'answered' | 'no_info' | 'off_topic' | 'invalid' | 'error'.
 export async function askQuestion(question) {
   const invalid = validateQuestion(question);
   if (invalid) return { state: 'invalid', ...invalid };
@@ -41,7 +37,6 @@ export async function askQuestion(question) {
           signal: AbortSignal.timeout(TIMEOUT_MS),
         });
   } catch (err) {
-    // Sin red, servidor apagado o pasaron los 30 s.
     const timedOut = err.name === 'TimeoutError';
     return {
       state: 'error',
@@ -54,7 +49,6 @@ export async function askQuestion(question) {
 
   const body = await res.json().catch(() => null);
 
-  // 3. Primero el código HTTP: ¿el sistema funcionó?
   if (res.ok && body?.status) {
     return { state: body.status, data: body };
   }
@@ -62,7 +56,6 @@ export async function askQuestion(question) {
   const code = body?.error?.code || 'INTERNAL_ERROR';
 
   if (res.status === 400) {
-    // El backend también rechazó la pregunta: mismo estado que la validación del frontend.
     return { state: 'invalid', code, message: body?.error?.message || 'Revisa tu pregunta.' };
   }
   if (res.status === 429) {
@@ -79,10 +72,9 @@ export async function askQuestion(question) {
   };
 }
 
-// --- Modo mock -------------------------------------------------------------
-// Escenario con ?mock=... en la URL (answered, noInfo, offTopic, rateLimited,
-// upstream, internal, network) y espera con ?delay=ms (default 1200).
-// Devuelve un Response real para que mocks y API pasen por el mismo código.
+// Modo mock: ?mock=answered|noInfo|offTopic|rateLimited|upstream|internal|network
+// y ?delay=ms (1200 por defecto). Regresa un Response real para que los mocks
+// pasen por el mismo manejo que la API.
 async function fakeFetch() {
   const params = new URLSearchParams(window.location.search);
   const scenario = params.get('mock') || 'answered';

@@ -1,7 +1,6 @@
 import Citations from './Citations.jsx';
 import SourceList from './SourceList.jsx';
 
-// Estado 3 · Respuesta: resumen → pasos → enlace oficial → fuentes.
 function AnswerView({ data }) {
   const { summary, steps, sources, officialUrl } = data;
 

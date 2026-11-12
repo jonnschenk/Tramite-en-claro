@@ -1,8 +1,6 @@
 import { useRef } from 'react';
 import { MAX_LENGTH } from '../api/ask.js';
 
-// Campo de pregunta con contador, validación accesible y botón.
-// No guarda estado propio: App le pasa el valor y decide qué hacer al enviar.
 function QuestionForm({ value, onChange, onSubmit, isLoading, error }) {
   const fieldRef = useRef(null);
   const length = value.trim().length;
@@ -11,11 +9,9 @@ function QuestionForm({ value, onChange, onSubmit, isLoading, error }) {
   function handleSubmit(event) {
     event.preventDefault();
     const ok = onSubmit();
-    // Si la pregunta no es válida, el foco regresa al campo.
     if (!ok) fieldRef.current.focus();
   }
 
-  // Enter envía; Shift + Enter hace un salto de línea.
   function handleKeyDown(event) {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();

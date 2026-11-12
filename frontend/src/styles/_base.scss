@@ -1,4 +1,3 @@
-
 @use 'tokens' as *;
 @use 'mixins' as *;
 
@@ -44,7 +43,6 @@ textarea {
   font: inherit;
 }
 
-// Oculta texto a la vista, pero no al lector de pantalla.
 .visually-hidden {
   position: absolute;
   width: 1px;
