@@ -4,7 +4,8 @@
     "question": "¿Cuánto cuesta una copia certificada del acta de nacimiento?",
     "expected": "answered",
     "sources": ["portal-cdmx-copias-certificadas", "plataforma-nacional-acta-en-linea"],
-    "mustInclude": ["98"]
+    "mustInclude": ["98"],
+    "steps": false
   },
   {
     "id": "q02",
@@ -32,14 +33,16 @@
     "question": "¿Cuánto cuesta la búsqueda de antecedentes registrales?",
     "expected": "answered",
     "sources": ["portal-cdmx-busqueda-antecedentes"],
-    "mustInclude": ["94"]
+    "mustInclude": ["94"],
+    "steps": false
   },
   {
     "id": "q06",
     "question": "¿En qué horario atienden los juzgados del Registro Civil?",
     "expected": "answered",
     "sources": ["registro-civil-cdmx-guia", "oficinas-registro-civil-cdmx"],
-    "mustInclude": ["15"]
+    "mustInclude": ["15"],
+    "steps": false
   },
   {
     "id": "q07",
@@ -53,21 +56,24 @@
     "question": "¿Cuánto cuesta corregir un error de captura en el extracto de mi acta?",
     "expected": "answered",
     "sources": ["portal-cdmx-correccion-extractos"],
-    "mustInclude": ["sin costo|gratis|gratuit|no tiene costo|no cuesta"]
+    "mustInclude": ["sin costo|gratis|gratuit|no tiene costo|no cuesta"],
+    "steps": false
   },
   {
     "id": "q09",
     "question": "¿Cuánto cuesta la aclaración de un acta por enmienda?",
     "expected": "answered",
     "sources": ["portal-cdmx-aclaracion-actas", "portal-cdmx-correccion-administrativa"],
-    "mustInclude": ["780"]
+    "mustInclude": ["780"],
+    "steps": false
   },
   {
     "id": "q10",
     "question": "Si pido la corrección administrativa de mi acta en línea, ¿cuánto tarda la respuesta?",
     "expected": "answered",
     "sources": ["portal-cdmx-correccion-administrativa"],
-    "mustInclude": ["3 dias"]
+    "mustInclude": ["3 dias"],
+    "steps": false
   },
   {
     "id": "q11",
@@ -81,7 +87,8 @@
     "question": "¿El acta de nacimiento digital tiene vigencia?",
     "expected": "answered",
     "sources": ["registro-civil-cdmx-guia", "plataforma-nacional-acta-en-linea", "portal-cdmx-copias-certificadas"],
-    "mustInclude": ["no tiene vigencia|sin vigencia|permanente|no caduca|no vence"]
+    "mustInclude": ["no tiene vigencia|sin vigencia|permanente|no caduca|no vence"],
+    "steps": false
   },
   {
     "id": "q13",

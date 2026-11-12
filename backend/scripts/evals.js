@@ -1,5 +1,4 @@
-// Manda cada pregunta de evals/questions.json a POST /ask y revisa el status,
-// la fuente citada y el dato clave. Necesita el servidor corriendo.
+// Manda cada pregunta de evals/questions.json a POST /ask y revisa el status, la fuente citada y el dato clave. Además mide dos cosas de calidad: pasos de más en preguntas de un solo dato y marcas como [3] dentro del texto.
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 
@@ -13,7 +12,6 @@ const index = JSON.parse(await readFile(new URL('data/index.json', ROOT), 'utf8'
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Sin mayúsculas ni acentos, para que "Búsqueda" y "busqueda" cuenten igual.
 const normalize = (text) =>
   text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
@@ -42,7 +40,6 @@ function grade(item, { status, body }) {
       const expectedUrls = item.sources.map((id) => index.sources[id]?.url);
       result.sourceOk = body.sources.some((s) => expectedUrls.includes(s.url));
 
-      // En mustInclude, "a|b" acepta cualquiera de las dos opciones.
       const text = normalize(
         [body.summary.text, ...body.steps.map((step) => step.text)].join(' '),
       );
@@ -52,6 +49,12 @@ function grade(item, { status, body }) {
     } else {
       result.sourceOk = false;
       result.contentOk = false;
+    }
+    
+    if (status === 'answered') {
+      const texts = [body.summary.text, ...body.steps.map((step) => step.text)];
+      result.noMarkers = !texts.some((t) => /\[\d+\]/.test(t));
+      if (item.steps === false) result.noExtraSteps = body.steps.length === 0;
     }
     result.pass = result.statusOk && result.sourceOk && result.contentOk;
   } else {
@@ -77,6 +80,8 @@ for (const [i, item] of questions.entries()) {
 const pct = (n, d) => (d ? `${Math.round((n / d) * 100)}% (${n}/${d})` : '—');
 const answerable = rows.filter((r) => r.expected === 'answered');
 const unanswerable = rows.filter((r) => r.expected !== 'answered');
+const oneFact = answerable.filter((r) => r.steps === false && r.got === 'answered');
+const answered = rows.filter((r) => r.got === 'answered');
 const errors = rows.filter((r) => r.got.startsWith('error'));
 const avgMs = Math.round(rows.reduce((sum, r) => sum + r.ms, 0) / rows.length);
 
@@ -90,6 +95,10 @@ const summary = {
   contentCorrect: answerable.filter((r) => r.contentOk).length,
   unanswerable: unanswerable.length,
   refused: unanswerable.filter((r) => r.refused).length,
+  oneFact: oneFact.length,
+  noExtraSteps: oneFact.filter((r) => r.noExtraSteps).length,
+  answered: answered.length,
+  noMarkers: answered.filter((r) => r.noMarkers).length,
   errors: errors.length,
   avgMs,
 };
@@ -101,6 +110,8 @@ const table = `| Métrica | Resultado |
 | Cita una fuente correcta (preguntas con respuesta) | ${pct(summary.sourceCorrect, summary.answerable)} |
 | Trae el dato clave (preguntas con respuesta) | ${pct(summary.contentCorrect, summary.answerable)} |
 | Se niega cuando debe (sin información + fuera de tema) | ${pct(summary.refused, summary.unanswerable)} |
+| Calidad: sin pasos de más (preguntas de un solo dato) | ${pct(summary.noExtraSteps, summary.oneFact)} |
+| Calidad: sin marcas [n] dentro del texto | ${pct(summary.noMarkers, summary.answered)} |
 | Errores (502/500/red) | ${summary.errors} |
 | Tiempo promedio por pregunta | ${(avgMs / 1000).toFixed(1)} s |`;
 
