@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { askQuestion, validateQuestion } from './api/ask.js';
 import Header from './components/Header.jsx';
 import Notice from './components/Notice.jsx';
@@ -6,6 +6,9 @@ import QuestionForm from './components/QuestionForm.jsx';
 import SuggestedQuestions from './components/SuggestedQuestions.jsx';
 import LoadingState from './components/LoadingState.jsx';
 import AnswerView from './components/AnswerView.jsx';
+import NoInfoState from './components/NoInfoState.jsx';
+import OffTopicState from './components/OffTopicState.jsx';
+import ErrorState from './components/ErrorState.jsx';
 
 // Preguntas que el corpus sí cubre (fuentes 01, 02, 05 y 06).
 const SUGGESTIONS = [
@@ -19,6 +22,7 @@ function App() {
   const [question, setQuestion] = useState('');
   const [formError, setFormError] = useState(null);
   const [result, setResult] = useState(null);
+  const lastQuestion = useRef(''); // la última pregunta enviada, para "Reintentar"
 
   const isIdle = result === null;
   const isLoading = result?.state === 'loading';
@@ -47,6 +51,7 @@ function App() {
   }
 
   async function sendQuestion(text) {
+    lastQuestion.current = text;
     setResult({ state: 'loading' });
     const response = await askQuestion(text);
 
@@ -92,12 +97,15 @@ function App() {
         />
 
         {/* aria-live: el lector de pantalla anuncia lo que aparece aquí (cargando, respuesta, errores). */}
-               <section className="result" aria-live="polite" aria-busy={isLoading}>
+        <section className="result" aria-live="polite" aria-busy={isLoading}>
           {isLoading && <LoadingState />}
           {result?.state === 'answered' && <AnswerView data={result.data} />}
-          {/* Temporal: no_info, off_topic y error se muestran en crudo hasta el paso 8. */}
-          {['no_info', 'off_topic', 'error'].includes(result?.state) && (
-            <pre>{JSON.stringify(result, null, 2)}</pre>
+          {result?.state === 'no_info' && <NoInfoState data={result.data} />}
+          {result?.state === 'off_topic' && (
+            <OffTopicState data={result.data} onSelect={handleSuggestion} />
+          )}
+          {result?.state === 'error' && (
+            <ErrorState message={result.message} onRetry={() => sendQuestion(lastQuestion.current)} />
           )}
         </section>
       </main>
