@@ -5,6 +5,19 @@ const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
 export const MAX_LENGTH = 500; // mismo límite que el backend
 const TIMEOUT_MS = 30_000;
+// Render gratis se duerme tras 15 min sin visitas y tarda ~1 min en despertar.
+const WAKE_TIMEOUT_MS = 90_000;
+
+let wakeUp = null; // la llamada a /health; se hace una sola vez por visita
+
+// Despierta al servidor al abrir la página. Nunca lanza: si falla, ask mostrará su propio error.
+export function wakeUpServer() {
+  if (USE_MOCKS) return Promise.resolve();
+  wakeUp ??= fetch(`${API_URL}/health`, { signal: AbortSignal.timeout(WAKE_TIMEOUT_MS) })
+    .then(() => {})
+    .catch(() => {});
+  return wakeUp;
+}
 
 export function validateQuestion(question) {
   const clean = question.trim();
@@ -20,11 +33,13 @@ export function validateQuestion(question) {
   return null;
 }
 
-// Nunca lanza: siempre regresa { state } con
-// 'answered' | 'no_info' | 'off_topic' | 'invalid' | 'error'.
+// Nunca lanza: siempre regresa { state } con 'answered' | 'no_info' | 'off_topic' | 'invalid' | 'error'.
 export async function askQuestion(question) {
   const invalid = validateQuestion(question);
   if (invalid) return { state: 'invalid', ...invalid };
+
+  // Si el servidor sigue despertando, esperamos antes de contar los 30 s de /ask.
+  await wakeUpServer();
 
   let res;
   try {
@@ -72,8 +87,7 @@ export async function askQuestion(question) {
   };
 }
 
-// Modo mock: ?mock=answered|noInfo|offTopic|rateLimited|upstream|internal|network
-// y ?delay=ms (1200 por defecto). Regresa un Response real para que los mocks
+// Modo mock: ?mock=answered|noInfo|offTopic|rateLimited|upstream|internal|network y ?delay=ms (1200 por defecto). Regresa un Response real para que los mocks
 // pasen por el mismo manejo que la API.
 async function fakeFetch() {
   const params = new URLSearchParams(window.location.search);
