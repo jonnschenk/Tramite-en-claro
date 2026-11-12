@@ -1,0 +1,55 @@
+// Bloque BEM: how (sección "Cómo funciona", solo web)
+@use 'tokens' as *;
+@use 'mixins' as *;
+
+.how {
+  display: none; // en móvil no se muestra: la pantalla es para preguntar
+
+  @include web {
+    display: block;
+    margin-top: 24px;
+  }
+
+  &__title {
+    @include eyebrow;
+    margin-bottom: 12px;
+    color: $color-text-secondary;
+  }
+
+  &__list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__item {
+    display: grid;
+    align-content: start;
+    gap: 8px;
+  }
+
+  &__number {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: $radius-pill;
+    background: $color-accent-soft;
+    color: $color-accent-hover;
+    font-weight: 700;
+  }
+
+  &__item-title {
+    font-size: 1.0625rem;
+    font-weight: 700;
+  }
+
+  &__text {
+    margin: 0;
+    color: $color-text-secondary;
+    font-size: 0.9375rem;
+  }
+}

@@ -39,7 +39,7 @@ function QuestionForm({ value, onChange, onSubmit, isLoading, error }) {
           id="question"
           className="question-form__input"
           rows={2}
-          placeholder="Escribe tu duda. Ej.: ¿Cuánto cuesta una copia certificada?"
+          placeholder="Escribe tu duda sobre el acta…"
           value={value}
           onChange={(event) => onChange(event.target.value)}
           onKeyDown={handleKeyDown}

@@ -9,6 +9,7 @@ import AnswerView from './components/AnswerView.jsx';
 import NoInfoState from './components/NoInfoState.jsx';
 import OffTopicState from './components/OffTopicState.jsx';
 import ErrorState from './components/ErrorState.jsx';
+import HowItWorks from './components/HowItWorks.jsx';
 
 // Preguntas que el corpus sí cubre (fuentes 01, 02, 05 y 06).
 const SUGGESTIONS = [
@@ -67,7 +68,7 @@ function App() {
   return (
     <>
       <Header />
-      <main className="page">
+      <main className={`page${isIdle ? ' page--idle' : ''}`}>
         <Notice />
 
         {isIdle ? (
@@ -88,13 +89,17 @@ function App() {
           />
         )}
 
-        <QuestionForm
-          value={question}
-          onChange={handleChange}
-          onSubmit={handleSubmit}
-          isLoading={isLoading}
-          error={formError}
-        />
+        <div className={`ask-bar${isIdle ? '' : ' ask-bar--docked'}`}>
+          <QuestionForm
+            value={question}
+            onChange={handleChange}
+            onSubmit={handleSubmit}
+            isLoading={isLoading}
+            error={formError}
+          />
+        </div>
+
+        {isIdle && <HowItWorks />}
 
         {/* aria-live: el lector de pantalla anuncia lo que aparece aquí (cargando, respuesta, errores). */}
         <section className="result" aria-live="polite" aria-busy={isLoading}>
