@@ -1,0 +1,86 @@
+@use 'tokens' as *;
+
+.status {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  border: 1px solid transparent;
+
+  &__icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  &__body {
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  &__text {
+    margin: 0;
+  }
+
+  &__link {
+    justify-self: start;
+    font-weight: 600;
+  }
+
+  &__retry {
+    justify-self: start;
+    min-height: $touch-target;
+    padding-inline: 22px;
+    border: 0;
+    border-radius: $radius-pill;
+    background: $color-error-strong;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      background: $color-error-title;
+    }
+  }
+
+  // Sin información: gris azulado neutro, NO rojo.
+  &--no-info {
+    background: $color-noinfo-bg;
+    border-color: $color-noinfo-border;
+    color: $color-noinfo-text;
+    box-shadow: none;
+
+    .status__icon {
+      color: $color-noinfo-icon;
+    }
+  }
+
+  // Fuera de tema: tarjeta blanca normal con sugerencias.
+  &--off-topic {
+    .status__icon {
+      color: $color-text-secondary;
+    }
+  }
+
+  // Error: arcilla.
+  &--error {
+    background: $color-error-bg;
+    border-color: $color-error-border;
+    color: $color-error-text;
+    box-shadow: none;
+
+    .status__icon {
+      color: $color-error-strong;
+    }
+
+    .status__title {
+      color: $color-error-title;
+    }
+  }
+}
