@@ -142,7 +142,7 @@ El contrato de `POST /ask` está en [docs/api-contract.md](docs/api-contract.md)
 - **GitHub rechazó un push (GH007)** porque exponía mi correo privado. Ahora uso el correo noreply de GitHub.
 - **El formulario de Render venía con el plan de 7 USD, `yarn` y sin Root Directory:** son los valores por defecto de Render, no los de mi proyecto. Revisé cada campo antes de desplegar.
 - **"Add from .env" metió `PORT` y una `ANTHROPIC_API_KEY` vacía en Render:** copia el archivo completo. Borré esas filas.
-- **Render instaló Node 26:** `"engines": ">=20"` pide la versión más nueva. Lo fijé en `24.x`, la misma que uso en mi computadora.
+- **Render instaló Node 26:** `"engines": ">=20"` pide la versión más nueva. Lo fijé en `24.x`, la misma serie que uso en mi computadora; Render ahora usa 24.22.3.
 - **Firebase: "Alcanzaste el límite de proyectos":** por eso cambié a GitHub Pages.
 - **`//Necesito estudiar "aria live"` se veía en la página publicada:** dentro del `return` estoy en JSX, donde `//` es texto y React lo muestra. En JSX los comentarios van en `{/* … */}`.
 - **Safari no encontraba "jonnschenk.github.io,http":** pegué el valor de `CORS_ORIGIN` en la barra de direcciones. Es configuración del backend, no la URL de la app.
@@ -252,6 +252,20 @@ Uso Claude Code como par de programación. Yo decido qué se construye y por qu�
 
 ## Créditos
 
-Pendiente de completar al cierre. Debe decir con honestidad qué escribí yo, qué generé con ayuda de Claude y Claude Code, y qué librerías usé.
+**Lo que hice yo:** la idea y el problema, el alcance del MVP, las decisiones de diseño y producto, la elección y revisión de las 10 fuentes oficiales, la calibración del umbral, la verificación de las preguntas de evals contra las fuentes, todas las pruebas (locales y en producción) y la configuración de Render y GitHub Pages.
+
+**Lo que hice con ayuda de Claude (chat) y Claude Code:**
+
+- **Fase 1 (diseño):** los mockups de móvil y web se armaron con Claude design *a partir del sistema de diseño de mi portafolio*; yo tomé las decisiones y elegí el logo entre las opciones que diseñé opciones.
+- **Fases 2 y 3 (frontend, backend y evals):** el código del frontend lo hice de forma asistida con Claude code, mientras mi primer backend lo contruí aprendiendo con Claude, el ayudo a generar código paso a paso con la explicación y con base en mis decisiones, lo probé, calibré el umbral y decidí entre las alternativas. Las preguntas de evals las redacté con ayuda de Claude y las verifiqué contra las fuentes. 
+- **Limpieza:** la pasada de comentarios y del README (commit `add5e25`) la hizo Claude Code con base en los feedbacks que le pedí trabajar
+- **Fase 4 (despliegue):** el código del despertar, el workflow de GitHub Actions y el cambio en `vite.config.js` los generó Claude; yo los integré, los probé en producción y decidí las plataformas. El comentario JSX que se veía en la página lo encontré yo.
+
+**Librerías y servicios:**
+
+- Frontend: React, Vite, Sass, `@fontsource-variable/inter`, oxlint
+- Backend: Express, `cors`, `express-rate-limit`
+- IA: Voyage AI (embeddings `voyage-4`), DeepSeek vía OpenRouter (respuestas)
+- Despliegue: Render (API) y GitHub Pages con GitHub Actions (frontend)
 
 **Fase 4 (despliegue):** el código del despertar, el workflow de GitHub Actions y el cambio en `vite.config.js` los generó Claude; yo los integré, los probé en producción y decidí las plataformas. La configuración de Render y GitHub Pages la hice yo en sus paneles, con guía de Claude. El comentario JSX que se veía en la página lo encontré yo.
