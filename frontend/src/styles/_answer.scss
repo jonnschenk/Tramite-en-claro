@@ -1,0 +1,98 @@
+// Bloques BEM: answer-layout, answer y citations (estado 3 · Respuesta)
+@use 'tokens' as *;
+@use 'mixins' as *;
+
+// Respuesta y fuentes lado a lado en web; en pantallas angostas las fuentes bajan solas.
+.answer-layout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+
+  > .answer {
+    flex: 999 1 560px;
+  }
+
+  > .sources {
+    flex: 1 1 320px;
+  }
+}
+
+.answer {
+  display: grid;
+  gap: 20px;
+
+  &__eyebrow {
+    @include eyebrow;
+    color: $color-text-secondary;
+  }
+
+  &__summary {
+    margin: 0;
+    font-size: $font-size-body-large;
+    font-weight: 600;
+  }
+
+  &__steps {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__step {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  &__step-number {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: $radius-pill;
+    background: $color-accent-soft;
+    color: $color-accent-hover;
+    font-weight: 700;
+  }
+
+  &__step-text {
+    padding-top: 3px;
+  }
+
+  &__official {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    min-height: $touch-target;
+    padding-inline: 22px;
+    border-radius: $radius-pill;
+    background: $color-accent;
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      background: $color-accent-hover;
+      color: #fff;
+    }
+  }
+}
+
+.citations {
+  white-space: nowrap;
+
+  &__link {
+    margin-left: 2px;
+    font-size: 0.875em;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
