@@ -58,12 +58,43 @@ El contrato de `POST /ask` está en [docs/api-contract.md](docs/api-contract.md)
 
 ### Backend
 
-- **Índice en un archivo JSON, sin base de datos vectorial.** Son 10 fuentes y unos 50 fragmentos: compararlos todos en memoria es instantáneo y no necesito otro servicio.
-- **Un fragmento por sección `##`,** y cada uno empieza con el título del documento. Así una sección corta como "Costo: gratuito" sigue sabiendo de qué trámite habla.
-- **"Fuera de tema" se decide con un umbral de similitud, sin llamar al modelo.** Es más rápido, más barato y no puede inventar nada. Lo calibré con preguntas de prueba: las del tema dan 0.56 o más y las de fuera 0.48 o menos, así que dejé 0.50.
-- **El modelo responde en JSON y cita fragmentos por número.** El backend traduce esas citas a fuentes y descarta los pasos que no tienen una cita válida.
-- **Proveedor del modelo intercambiable** con `LLM_PROVIDER` (OpenRouter o Anthropic), sin tocar código.
-- **Límite de 10 preguntas por minuto por IP, solo en `/ask`,** porque es la única ruta que gasta APIs de pago.
+**Preparar el índice (`ingest.js`)**
+
+- **Un fragmento por sección `##`, no cortes fijos de N palabras.** Las fuentes ya vienen divididas por tema.
+- **Secciones de menos de 30 palabras se unen y las de más de 250 se parten.** Una sección mínima casi no tiene significado y una muy larga mezcla temas. Las tablas se parten por filas y cada pedazo repite el encabezado, para que se entienda solo.
+- **Cada fragmento empieza con "Título — Sección".** Así una sección corta como "Costo: gratuito" sigue sabiendo de qué trámite habla.
+- **Las `notas` del frontmatter no entran al embedding.** Son mías como curador, no información oficial.
+- **Parser propio de frontmatter en lugar de `gray-matter`.** Es una dependencia menos.
+- **`--dry-run` para ver los fragmentos sin llamar a Voyage.** Puedo ajustar el corte gratis.
+- **`index.json` va en el repo y sin sangría.** El servidor despliega sin gastar Voyage y los diffs quedan pequeños.
+
+**Buscar**
+
+- **Índice en memoria con similitud coseno, sin base de datos vectorial.** Son 53 fragmentos y compararlos todos tarda menos de 1 ms.
+- **Voyage con `input_type` distinto:** `document` para los fragmentos y `query` para las preguntas.
+- **El servidor no arranca si falta el índice o si se hizo con otro modelo.** Vectores de modelos distintos no se pueden comparar.
+- **"Fuera de tema" se decide con un umbral, sin llamar al modelo.** Es más rápido, más barato y no puede inventar nada. Lo calibré con `npm run similarity`: las preguntas del tema dieron 0.564–0.638 y las de fuera 0.260–0.481. Dejé 0.50, en la parte baja del hueco, porque si algo se cuela todavía queda la red del `no_info` del modelo.
+- **Al modelo solo le llegan los 5 fragmentos más parecidos que pasan el umbral.**
+
+**Responder**
+
+- **El modelo cita números de fragmento, no URLs.** Así no puede inventar enlaces. Las citas inválidas se ignoran, los pasos sin cita no se muestran y si el resumen no tiene cita la respuesta pasa a `no_info`.
+- **El modelo decide `no_info` con `found: false`.** En ese caso `officialUrl` apunta a la fuente más parecida a la pregunta.
+- **Si el modelo no responde JSON válido, es un 502.** La falla es del servicio, no de la pregunta.
+- **`temperature: 0`** para que los evals sean reproducibles.
+- **Proveedor intercambiable con `LLM_PROVIDER`** (OpenRouter o Anthropic), sin tocar código.
+- **Tiempos: 10 s para Voyage + 18 s para el modelo,** para que todo quepa en los 30 s que espera el frontend.
+
+**Servidor**
+
+- **Express 5 + `cors` + `express-rate-limit`.** Express 5 manda solo los errores async al manejador, sin `try/catch`.
+- **Límite de 10 preguntas por minuto por IP, solo en `/ask`.** Es la única ruta que gasta APIs de pago. `/health` va antes del límite y `trust proxy` hace que cada persona tenga su propia IP detrás del proxy de Render.
+- **JSON mal formado responde 400 `EMPTY_QUESTION`.** Así no tuve que agregar un código nuevo al contrato.
+
+**Evals**
+
+- **Los evals llaman al mismo `POST /ask` por HTTP** que usa la pantalla, así prueban el sistema completo.
+- **El dato clave se revisa con texto (sin acentos y con alternativas), no con otro LLM como juez.** Es más simple y siempre da el mismo resultado.
 
 ## Errores y aprendizajes
 
@@ -73,6 +104,13 @@ El contrato de `POST /ask` está en [docs/api-contract.md](docs/api-contract.md)
 - **Vite marcaba `Empty parenthesized expression`:** el código que copié había perdido sus etiquetas JSX. Aprendí a leer el error por archivo, línea y columna.
 - **El placeholder se cortaba en móvil:** era muy largo para 390 px y lo acorté.
 - **El error 502 nunca llegaba al frontend:** el manejador de errores mandaba el 500 antes de revisar si era un `UpstreamError`. Lo encontré en una revisión de código con Claude Code.
+- **El servidor se cerraba sin ningún mensaje:** `server.js` estaba vacío porque el código no se había guardado.
+- **El frontend decía "No pudimos conectar":** había cerrado la terminal del backend. El mensaje de error funcionó como debía.
+- **Voyage respondía 429:** sin método de pago solo permite 3 peticiones por minuto. Pasó en la calibración y luego en 12 de 20 evals. Los evals detectaron un problema de infraestructura, no de código.
+- **La consola se llenaba con la pila completa en cada 502:** para errores de Voyage o del modelo ahora solo imprimo el mensaje.
+- **Push rechazado y conflicto en `server.js`:** se subió una limpieza desde otra copia del repo mientras yo seguía trabajando en la mía. Lo resolví con `git pull --no-rebase` y quedándome con la versión correcta del archivo.
+- **`fg: no current job`:** copié el prompt `backend %` junto con el comando.
+- **GitHub rechazó un push (GH007)** porque exponía mi correo privado. Ahora uso el correo noreply de GitHub.
 
 ## Fuentes oficiales del corpus
 
@@ -101,6 +139,15 @@ npm run smoke          # revisa que las llaves funcionen
 npm run dev            # API en http://localhost:3000
 ```
 
+Otros comandos del backend:
+
+```bash
+npm run ingest:dry                  # ver los fragmentos sin llamar a Voyage
+npm run ingest                      # regenerar data/index.json
+npm run similarity -- "pregunta"    # ver el puntaje de una pregunta contra el índice
+npm run evals                       # correr los evals (con el servidor encendido)
+```
+
 Frontend, en otra terminal:
 
 ```bash
@@ -112,7 +159,28 @@ npm run dev            # abre http://localhost:5173
 
 ## Resultados de evals
 
-Pendiente (fase 4, 16 y 17 de noviembre de 2026).
+20 preguntas en `backend/evals/questions.json`: 12 con respuesta, 3 sin información y 5 fuera de tema (una es un intento de prompt injection).
+
+**Corrida 1 (línea base, 12 de noviembre de 2026)**
+
+| Métrica | Resultado |
+|---|---|
+| Pasan todo | 95% (19/20) |
+| Status correcto | 95% (19/20) |
+| Cita una fuente correcta | 92% (11/12) |
+| Trae el dato clave | 92% (11/12) |
+| Se niega cuando debe | 100% (8/8) |
+| Errores | 1 (q07) |
+| Tiempo promedio | 2.4 s |
+
+La única falla es q07 (Velásquez/Velázquez), que respondió 502 a los 7.3 s. Sospecho que el modelo devuelve comillas sin escapar dentro del JSON; falta confirmarlo en el log. La corrida usó `EVAL_DELAY_MS=21000` por el límite de Voyage sin método de pago. El detalle completo está en `backend/evals/results/`.
+
+## Próximos pasos
+
+- Corregir q07 y volver a correr los evals para comparar con la corrida 1.
+- Mejorar los pasos: a veces agrega un paso de relleno o pone pasos cuando la pregunta solo pide un dato (como el costo). Los evals todavía no miden esto.
+- Agregar método de pago en Voyage: 3 peticiones por minuto no alcanzan para una demo pública.
+- Desplegar el backend en Render con `CORS_ORIGIN` apuntando al dominio de Firebase.
 
 ## Cómo uso IA en este proyecto
 
@@ -124,7 +192,8 @@ Uso Claude Code como par de programación. Yo decido qué se construye y por qu�
 2. **Partes pequeñas, una por commit.** Pido una pieza a la vez (el cliente de `/ask`, el formulario, el servidor, la búsqueda) para poder revisarla completa antes de seguir.
 3. **Probar, no confiar.** Cada parte pasa por algo que la compruebe: los mocks para los 7 estados de la pantalla, `npm run smoke` para las llaves, `/health` y `/ask` con preguntas reales y, al final, los evals.
 4. **Pedirle que revise, no solo que escriba.** Uso la IA para buscar bugs en mi código. Así encontré que el 502 nunca llegaba al frontend.
-5. **Limpiar lo que genera.** El código generado tiende a llenarse de comentarios que narran lo obvio. Hice una pasada para dejar solo los que explican una decisión.
+5. **Ayuda con los evals, pero yo verifico.** Las 20 preguntas de prueba las redacté con ayuda de Claude y revisé que cada respuesta esperada exista en las fuentes.
+6. **Limpiar lo que genera.** El código generado tiende a llenarse de comentarios que narran lo obvio. Hice una pasada para dejar solo los que explican una decisión.
 
 **Lo que no le delego:** qué problema resolver y para quién, el alcance del MVP, el diseño y la marca, los datos que entran al corpus (todas las fuentes las elegí y revisé yo) y la calibración del umbral.
 
