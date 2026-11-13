@@ -281,7 +281,7 @@ Al probar la demo en mi celular vi que el texto era muy grande, había que hacer
 | Buscador primero y preguntas frecuentes abajo, como etiquetas chicas | Sugerencias arriba del buscador | El buscador es la acción principal; las sugerencias son ayuda |
 | Header sólido y alineado al contenido, con la etiqueta "Independiente · no oficial" | Header transparente y recuadro amarillo en el home | El aviso sigue visible al hacer scroll y libera espacio del inicio |
 | Botón "Inicio" (casita) fuera del home y "atrás" que regresa al inicio | Botón "+ Nueva pregunta" | El "+" se lee como "agregar"; la barra de búsqueda ya permite preguntar otra cosa |
-| Créditos con mis links: footer en desktop, debajo del título en móvil | Footer también en móvil | En móvil el buscador fijo queda abajo y el footer nunca quedaría al final |
+| Créditos en una línea: mi nombre lleva a mi portafolio y LinkedIn/GitHub van como íconos. Footer en desktop, debajo del título en móvil | Texto "Portafolio · LinkedIn · GitHub" y footer también en móvil | Cuatro links con puntos se leían como texto legal; en móvil el buscador fijo queda abajo y el footer nunca quedaría al final |
 | Título en dos líneas, con "en claro." en el color del punto del logo | Una sola línea | Repite la firma visual de la marca |
 
 **Errores y aprendizajes del rediseño:**
