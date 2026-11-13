@@ -62,7 +62,7 @@
 
     @include web {
       display: flex;
-      width: min(92%, $home-column-max);
+      width: $home-width;
     }
   }
 }
@@ -87,7 +87,7 @@
 
 // Créditos debajo del título del home: solo en móvil y tablet.
 .hero__credits {
-  margin-top: 12px;
+  margin-top: 16px;
 
   @include web {
     display: none;

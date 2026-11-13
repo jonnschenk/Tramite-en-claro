@@ -22,7 +22,7 @@
     padding-bottom: calc(#{$ask-bar-space} + env(safe-area-inset-bottom));
     display: flex;
     flex-direction: column;
-    padding-top: clamp(24px, 5vh, 48px);
+    padding-top: clamp(32px, 6vh, 56px);
 
     // En móvil el buscador está fijo abajo: las sugerencias se pegan a él.
     .suggestions {
@@ -31,7 +31,7 @@
 
     @include web {
       display: grid;
-      width: min(92%, $home-column-max);
+      width: $home-width;
       min-height: calc(100dvh - #{$header-height} - #{$footer-height});
       padding-block: clamp(24px, 5vh, 72px);
       align-content: center;
@@ -55,29 +55,31 @@
 .ask-bar {
   position: fixed;
   inset-inline: 0;
-  bottom: 0;
+  // Con el teclado abierto, sube para quedar justo encima de él (ver useKeyboardOffset).
+  bottom: var(--keyboard-offset, 0px);
   z-index: 10;
-  padding: 12px 4% calc(12px + env(safe-area-inset-bottom));
-  @include glass;
-  border-width: 1px 0 0;
+  // Mismo fondo que la página: sin transparencia ni cambio de tono.
+  padding: 10px $gutter calc(12px + env(safe-area-inset-bottom));
+  background: $color-bg;
+  transition: bottom 0.25s ease-out;
+
+  // Con el teclado abierto ya no hace falta el espacio del borde inferior del iPhone.
+  :root[data-keyboard-open] & {
+    padding-bottom: 10px;
+  }
 
   @include web {
     position: static;
     padding: 0;
     background: none;
-    border: 0;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
   }
 
   &--docked {
     @include web {
       position: sticky;
       top: $header-height + 12px;
-      padding: 12px;
-      margin-inline: -12px;
-      border-radius: $radius-card-web;
-      @include glass;
+      padding-block: 12px;
+      background: $color-bg;
     }
   }
 }

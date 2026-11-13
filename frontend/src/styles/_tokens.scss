@@ -58,6 +58,9 @@ $footer-height: 56px;
 // Alto de la barra fija de abajo en móvil (unos 110 px) más aire para que no tape el contenido.
 $ask-bar-space: 140px;
 $container-max: 1240px;
-$container-width: min(92%, $container-max);
 $home-column-max: 760px;
+// Margen a los lados de la pantalla: 24 px en móvil, crece hasta 48 px.
+$gutter: clamp(24px, 5vw, 48px);
+$container-width: min(calc(100% - 2 * #{$gutter}), $container-max);
+$home-width: min(calc(100% - 2 * #{$gutter}), $home-column-max);
 $bp-web: 960px;

@@ -1,22 +1,34 @@
 @use 'tokens' as *;
+@use 'mixins' as *;
+
+// En móvil la barra es más baja (44 px en total): botón de 36 px.
+$search-button-mobile: 36px;
 
 // Distancia del borde izquierdo de la barra al texto.
 $field-inset: 20px;
 
 .question-form {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 
   &__field {
     display: flex;
     align-items: flex-end;
     gap: 8px;
-    padding: 4px 4px 4px $field-inset;
+    padding: 3px 3px 3px $field-inset;
+
+    @include web {
+      padding: 4px 4px 4px $field-inset;
+    }
     background: $color-surface;
     border: 1px solid $color-input-border;
     // Radio fijo (mitad de la altura con una línea): se ve como píldora y sigue bien cuando el campo crece.
-    border-radius: 29px;
+    border-radius: 22px;
     box-shadow: $shadow-search;
+
+    @include web {
+      border-radius: 29px;
+    }
     transition: box-shadow 0.2s ease;
 
     &:hover {
@@ -35,10 +47,17 @@ $field-inset: 20px;
 
   &__input {
     flex: 1;
-    // Misma altura que el botón (12 + 24 + 12 = 48) para que el texto quede centrado.
-    min-height: $touch-target;
+    // Misma altura que el botón para que el texto quede centrado:
+    // móvil 6 + 24 + 6 = 36; desktop 12 + 24 + 12 = 48.
+    min-height: $search-button-mobile;
     max-height: 120px;
-    padding: 12px 0;
+    padding: 6px 0;
+    -webkit-appearance: none;
+
+    @include web {
+      min-height: $touch-target;
+      padding-block: 12px;
+    }
     border: 0;
     background: transparent;
     color: $color-text;
@@ -66,11 +85,16 @@ $field-inset: 20px;
     display: grid;
     place-items: center;
     flex-shrink: 0;
-    width: $touch-target;
-    height: $touch-target;
+    width: $search-button-mobile;
+    height: $search-button-mobile;
     padding: 0;
     border: 0;
     border-radius: 50%;
+
+    @include web {
+      width: $touch-target;
+      height: $touch-target;
+    }
     background: $color-button;
     color: #fff;
     box-shadow: 0 6px 16px -4px rgba(11, 18, 32, 0.45);
@@ -99,8 +123,13 @@ $field-inset: 20px;
   }
 
   &__icon {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
+
+    @include web {
+      width: 24px;
+      height: 24px;
+    }
   }
 
   &__spinner {

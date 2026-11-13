@@ -45,7 +45,7 @@ $bp-header-compact: 480px;
     // En el home el header usa la misma columna que el contenido.
     &--home {
       @include web {
-        width: min(92%, $home-column-max);
+        width: $home-width;
       }
     }
   }

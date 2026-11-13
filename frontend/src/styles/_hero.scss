@@ -8,6 +8,13 @@
     letter-spacing: $tracking-title-tight;
   }
 
+  // En móvil "en claro." va en su propia línea.
+  &__break {
+    @include web {
+      display: none;
+    }
+  }
+
   &__dot {
     color: $color-accent;
   }
