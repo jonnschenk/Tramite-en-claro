@@ -8,6 +8,9 @@ export default defineConfig(({ command }) => ({
   server: {
     // Expone el servidor en la red local para abrirlo desde el iPhone (misma Wi-Fi).
     host: true,
+    // Permite abrirlo por el túnel de VS Code (https://xxxx-5173.usw3.devtunnels.ms).
+    // Solo ese dominio, no "true": así Vite sigue rechazando dominios desconocidos.
+    allowedHosts: ['.devtunnels.ms'],
     proxy: {
       // En desarrollo el frontend llama a /api/...; Vite lo reenvía al backend local.
       // El backend no usa prefijo /api: /api/ask → http://localhost:3000/ask
