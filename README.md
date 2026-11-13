@@ -32,13 +32,13 @@ El contrato de `POST /ask` está en [docs/api-contract.md](docs/api-contract.md)
 - **Una sola pantalla de pregunta y respuesta, no un chat.** Cada pregunta es independiente (igual que en los evals) y así el MVP es más chico.
 - **Respuesta con estructura fija:** resumen, pasos, enlace oficial y fuentes. Es más fácil de verificar que un texto libre y es justo lo que regresa el API.
 - **Mobile-first.** La mayoría busca trámites desde el celular. En móvil la barra de pregunta va abajo, al alcance del pulgar; en web va arriba, como un buscador.
-- **Avisos visibles desde el inicio:** "no es un sitio oficial" fijo arriba y "no escribas tu CURP" junto al campo.
+- **Avisos visibles desde el inicio:** "Independiente · no oficial" como etiqueta en el header (sigue visible al hacer scroll) y "no escribas tu CURP" junto al campo. En móvil ese aviso va arriba del campo: abajo lo tapaba la barra de Safari.
 - **Preguntas sugeridas que el corpus sí responde.** Evitan la página en blanco y que la primera prueba termine en "no tengo esa información".
 - **"Sin información" no se ve como error.** No responder es lo correcto, así que cada estado tiene su color: ámbar para el aviso, gris azulado para "sin información" y arcilla para errores reales.
 - **Color propio (petróleo `#1F5F7A`) sobre el sistema de mi portafolio.** El acento pizarra original era muy tenue para enlaces y citas.
 - **Logo de lupa con punto.** Junta "buscar en fuentes" con una respuesta final y retoma el punto de mi marca personal. Se sigue leyendo a 16 px.
 - **En web, respuesta y fuentes van lado a lado,** y hay una sección "Cómo funciona" en el inicio. En móvil no, porque la pantalla es para preguntar.
-- **Accesibilidad:** botones de 44 px o más, contraste AA y la respuesta en una región `aria-live`.
+- **Accesibilidad:** objetivos táctiles de 34 px o más (WCAG 2.2 AA pide 24), contraste AA y la respuesta en una región `aria-live`. Los botones que solo tienen ícono (lupa, inicio) tienen nombre para lector de pantalla.
 
 ### Contrato de API
 
@@ -52,10 +52,13 @@ El contrato de `POST /ask` está en [docs/api-contract.md](docs/api-contract.md)
 - **Vite + React en JavaScript.** CRA ya no se mantiene, JavaScript es lo que domino y Next.js no hacía falta porque mi servidor ya es Express.
 - **Mocks que copian el contrato.** Construí y probé los 7 estados de la pantalla antes de tener backend. El mock regresa un `Response` real, así que cambiar al API de verdad es solo poner `VITE_USE_MOCKS=false`. Con `?mock=` y `?delay=` en la URL reviso cada estado en segundos.
 - **Una sola función (`askQuestion`) habla con el API** y siempre regresa `{ state }`. Los componentes solo leen el estado; HTTP, errores y el timeout de 30 s viven en un solo lugar.
-- **Contador visible (0/500) y error al enviar,** en lugar de `maxlength` o un botón desactivado. `maxlength` corta en silencio un texto pegado y un botón gris no explica qué falta.
+- **Contador que aparece cerca del límite (desde 400/500) y error al enviar,** en lugar de `maxlength` o un botón desactivado. `maxlength` corta en silencio un texto pegado y un botón gris no explica qué falta; un "0/500" siempre visible era ruido.
 - **Tokens por función** (`$color-accent`, no `$color-petroleo`) y tonos calculados con `color.mix`. Cambiar el color del proyecto es una línea.
 - **Detalles de lector de pantalla:** las citas son enlaces que se leen "Fuente 1", siempre hay un `h1` aunque esté oculto y el foco regresa al campo cuando hay error.
 - **Detalles de uso:** "Sigue buscando…" aparece a los 10 s; "Reintentar" reenvía la última pregunta aunque ya estés escribiendo otra; en iPhone la barra respeta el área segura de abajo.
+- **"Atrás" regresa al inicio.** Al mostrar un resultado se agrega un paso al historial (`history.pushState`), así el botón o gesto de atrás del celular vuelve al home en lugar de salir de la página. Si vuelves mientras carga, la respuesta que llega después se ignora.
+- **Sin zoom al escribir en iPhone y barra que sube con el teclado.** `maximum-scale=1` en el viewport evita el zoom automático (pellizcar sigue funcionando) y `useKeyboardOffset` mide con `visualViewport` cuánto tapa el teclado para subir la barra.
+- **Proxy de Vite en desarrollo.** El frontend llama a `/api/...` y Vite lo reenvía al backend local; en producción el workflow pone la URL de Render. Así puedo abrir el proyecto en mi iPhone por la Wi-Fi sin tocar CORS.
 - **La fecha de consulta se arma con año, mes y día locales.** `new Date("2026-11-10")` se lee en UTC y en CDMX mostraba el día anterior.
 
 ### Backend
@@ -189,10 +192,14 @@ Frontend, en otra terminal:
 
 ```bash
 cd frontend
-cp .env.example .env
+cp .env.example .env   # VITE_USE_MOCKS=true usa respuestas de prueba; ponlo en false para usar el backend local
 npm install
 npm run dev            # abre http://localhost:5173
 ```
+
+Con `VITE_API_URL` vacío, las llamadas van a `/api` y el proxy de Vite las manda a `http://localhost:3000`.
+
+**En el celular, en tiempo real:** con el celular en la misma Wi-Fi, abre la dirección `Network:` que imprime Vite (por ejemplo `http://192.168.0.10:5173`). Desde otra red, usa un túnel de VS Code (pestaña Ports → Forward a Port → 5173) y déjalo en **Private**: un túnel público expone tu backend local y gasta tus llamadas a Voyage y OpenRouter.
 
 ## Resultados de evals
 
@@ -263,6 +270,28 @@ Un usuario probó la demo con "Cómo corrijo" y la app respondió "fuera de tema
 
 **Créditos:** la retroalimentación vino de un usuario real. Yo decidí la opción, escribí y revisé las preguntas cortas y corrí las mediciones. El código lo generó Claude; el diagnóstico de tokens y la última corrida de evals los ejecutó Claude Code con mis instrucciones.
 
+## Mejora · Rediseño del frontend
+
+Al probar la demo en mi celular vi que el texto era muy grande, había que hacer scroll en el inicio, el buscador se sentía pesado y la página hacía zoom al tocar el campo. Lo rediseñé probando cada cambio en Chrome (10 tamaños de pantalla, de 360×640 a 1920×1080), en el Simulator de Xcode y en mi iPhone.
+
+| Decisión | Alternativa descartada | Razón |
+|---|---|---|
+| Buscador en forma de píldora con botón circular de lupa | Botón con texto "Preguntar" | Se reconoce como buscador al instante y ocupa menos |
+| Home sin scroll en ningún tamaño; los espacios crecen con el alto de la pantalla (`clamp` con `vh`) | Espacios fijos | En pantallas bajas cabe todo y en altas el aire se reparte entre secciones |
+| Buscador primero y preguntas frecuentes abajo, como etiquetas chicas | Sugerencias arriba del buscador | El buscador es la acción principal; las sugerencias son ayuda |
+| Header sólido y alineado al contenido, con la etiqueta "Independiente · no oficial" | Header transparente y recuadro amarillo en el home | El aviso sigue visible al hacer scroll y libera espacio del inicio |
+| Botón "Inicio" (casita) fuera del home y "atrás" que regresa al inicio | Botón "+ Nueva pregunta" | El "+" se lee como "agregar"; la barra de búsqueda ya permite preguntar otra cosa |
+| Créditos con mis links: footer en desktop, debajo del título en móvil | Footer también en móvil | En móvil el buscador fijo queda abajo y el footer nunca quedaría al final |
+| Título en dos líneas, con "en claro." en el color del punto del logo | Una sola línea | Repite la firma visual de la marca |
+
+**Errores y aprendizajes del rediseño:**
+
+- **La línea del header hacía 1 px de scroll:** un `border-bottom` suma alto. La cambié por `box-shadow`, que no ocupa espacio.
+- **El campo hacía zoom al tocarlo en iPhone:** Safari acerca la página al enfocar un campo. Lo resolví con `maximum-scale=1` en el viewport y dejé el texto del campo en 16 px.
+- **El aviso de la CURP no se veía en Safari:** quedaba debajo del buscador fijo, donde lo tapa la barra del navegador. En móvil lo pasé arriba del campo.
+- **Mi `npm run dev` le preguntaba al backend de producción:** un `.env.local` con la URL de Render ganaba sobre `.env`. Lo encontré al configurar el proxy.
+- **El footer se encimaba con el buscador en el iPhone:** el espacio reservado era un número fijo. Quité el footer en móvil y dejé pendiente medir la barra real.
+
 ## Límites conocidos
 
 - **Arranque en frío.** Render en plan gratis duerme el servidor después de 15 minutos sin uso. El frontend lo despierta al abrir la página y muestra "Despertando el servidor…". En mi prueba, después de 30 minutos sin uso, `/health` tardó 22.7 s en responder (0.2 s ya despierto); Render avisa que puede pasar de 50 s.
@@ -275,6 +304,8 @@ Un usuario probó la demo con "Cómo corrijo" y la app respondió "fuera de tema
 - Escribir un set de preguntas nuevo, que no haya usado para ajustar el prompt, y correr los evals contra él.
 - Escribir otro set de preguntas cortas, distinto del que usé para decidir el umbral de 0.40, y medirlo con `npm run similarity -- --file`.
 - Agregar método de pago en Voyage: 3 peticiones por minuto no alcanzan para una demo pública.
+- Medir la altura real de la barra del buscador en móvil (`ResizeObserver`) en lugar del espacio fijo de 124 px, para que ningún celular tape el final de una respuesta.
+- Probar en iPhone real el gesto de atrás y la barra que sube con el teclado (en el navegador de escritorio no se pueden simular).
 
 ## Cómo uso IA en este proyecto
 
@@ -301,6 +332,7 @@ Uso Claude Code como par de programación. Yo decido qué se construye y por qu�
 - **Fases 2 y 3 (frontend, backend y evals):** el frontend lo hice de forma asistida con Claude Code. Mi primer backend lo construí aprendiendo con Claude: me ayudó a generar el código paso a paso, con explicaciones y con base en mis decisiones; yo lo probé, calibré el umbral y decidí entre las alternativas. Las preguntas de evals las redacté con ayuda de Claude y las verifiqué contra las fuentes.
 - **Limpieza:** la pasada de comentarios y del README (commit `add5e25`) la hizo Claude Code siguiendo los criterios que le di.
 - **Fase 4 (despliegue):** el código del despertar, el workflow de GitHub Actions y el cambio en `vite.config.js` los generó Claude; yo los integré, los probé en producción y decidí las plataformas. El comentario JSX que se veía en la página lo encontré yo.
+- **Rediseño del frontend:** las decisiones de diseño y qué cambiar las tomé yo al revisar la página en mi celular; Claude Code implementó los cambios, los midió en varios tamaños con Chrome sin ventana y me propuso alternativas cuando algo no convencía.
 
 **Librerías y servicios:**
 

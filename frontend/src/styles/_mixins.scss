@@ -12,17 +12,6 @@
   }
 }
 
-@mixin glass {
-  background: $glass-fallback;
-  border: 1px solid $glass-border;
-
-  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-    background: $glass-bg;
-    -webkit-backdrop-filter: $glass-blur;
-    backdrop-filter: $glass-blur;
-  }
-}
-
 @mixin eyebrow {
   font-size: $font-size-eyebrow;
   font-weight: 600;
