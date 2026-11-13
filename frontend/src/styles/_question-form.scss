@@ -8,10 +8,17 @@
     display: flex;
     align-items: flex-end;
     gap: 8px;
-    padding: 8px;
+    padding: 4px 4px 4px 20px;
     background: $color-surface;
-    border: 1.5px solid $color-input-border;
-    border-radius: $radius-input;
+    border: 1px solid $color-input-border;
+    // Radio fijo (mitad de la altura con una línea): se ve como píldora y sigue bien cuando el campo crece.
+    border-radius: 29px;
+    box-shadow: $shadow-search;
+    transition: box-shadow 0.2s ease;
+
+    &:hover {
+      box-shadow: $shadow-search-hover;
+    }
 
     &:focus-within {
       outline: 3px solid $color-accent;
@@ -25,14 +32,18 @@
 
   &__input {
     flex: 1;
+    // Misma altura que el botón (12 + 24 + 12 = 48) para que el texto quede centrado.
     min-height: $touch-target;
-    padding: 12px 8px;
+    max-height: 120px;
+    padding: 12px 0;
     border: 0;
     background: transparent;
     color: $color-text;
-    font-size: $font-size-body;
-    line-height: 1.4;
+    // 16 px mínimo: con menos, Safari en iPhone hace zoom al tocar el campo.
+    font-size: 1rem;
+    line-height: 24px;
     resize: none;
+    overflow-y: auto;
 
     &:focus-visible {
       outline: none;
@@ -49,26 +60,60 @@
   }
 
   &__submit {
-    min-height: $touch-target;
-    padding-inline: 20px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: $touch-target;
+    height: $touch-target;
+    padding: 0;
     border: 0;
-    border-radius: $radius-pill;
+    border-radius: 50%;
     background: $color-button;
     color: #fff;
-    font-weight: 600;
+    box-shadow: 0 6px 16px -4px rgba(11, 18, 32, 0.45);
     cursor: pointer;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+
+    &:hover:not(:disabled) {
+      background: $color-accent-hover;
+      transform: scale(1.05);
+    }
+
+    &:active:not(:disabled) {
+      transform: scale(0.96);
+    }
+
+    &:focus-visible {
+      outline: 3px solid $color-accent;
+      outline-offset: 2px;
+    }
 
     &:disabled {
       background: $color-button-disabled;
+      box-shadow: none;
       cursor: progress;
     }
+  }
+
+  &__icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  &__spinner {
+    width: 20px;
+    height: 20px;
+    border: 2.5px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: question-form-spin 0.8s linear infinite;
   }
 
   &__meta {
     display: flex;
     justify-content: space-between;
     gap: 16px;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     color: $color-text-secondary;
   }
 
@@ -102,5 +147,11 @@
     flex-shrink: 0;
     margin-top: 2px;
     color: $color-error-strong;
+  }
+}
+
+@keyframes question-form-spin {
+  to {
+    transform: rotate(360deg);
   }
 }

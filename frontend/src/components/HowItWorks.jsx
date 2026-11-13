@@ -1,7 +1,7 @@
 const STEPS = [
   {
     title: 'Busca en fuentes oficiales',
-    text: 'Revisa páginas oficiales del Registro Civil y de los gobiernos de la CDMX y federal.',
+    text: 'Consulta solo sitios oficiales: Registro Civil, Gobierno de la CDMX y Gobierno de México.',
   },
   {
     title: 'Responde en pasos claros',

@@ -6,7 +6,6 @@
 
   @include web {
     display: block;
-    margin-top: 24px;
   }
 
   &__title {
@@ -27,14 +26,16 @@
   &__item {
     display: grid;
     align-content: start;
-    gap: 8px;
+    gap: 6px;
+    padding: 20px;
   }
 
   &__number {
     display: grid;
     place-items: center;
-    width: 32px;
-    height: 32px;
+    width: 29px;
+    height: 29px;
+    font-size: 0.875rem;
     border-radius: $radius-pill;
     background: $color-accent-soft;
     color: $color-accent-hover;
@@ -42,13 +43,14 @@
   }
 
   &__item-title {
-    font-size: 1.0625rem;
+    font-size: 1rem;
     font-weight: 700;
   }
 
   &__text {
     margin: 0;
     color: $color-text-secondary;
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
   }
 }

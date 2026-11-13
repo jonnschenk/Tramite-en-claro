@@ -39,11 +39,13 @@ $radius-pill: 999px;
 $radius-card-mobile: 24px;
 $radius-card-web: 30px;
 $radius-input: 18px;
+$shadow-search: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px -12px rgba(15, 23, 42, 0.18);
+$shadow-search-hover: 0 1px 2px rgba(15, 23, 42, 0.05), 0 16px 40px -12px rgba(15, 23, 42, 0.24);
 $shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 24px 48px -12px rgba(15, 23, 42, 0.14);
 
 $font-family: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
-$font-size-body: 1rem;
-$font-size-body-large: 1.0625rem;
+$font-size-body: 0.9375rem;
+$font-size-body-large: 1rem;
 $font-size-eyebrow: 0.75rem;
 $line-height-body: 1.6;
 $tracking-title: -0.03em;
@@ -51,6 +53,7 @@ $tracking-title-tight: -0.045em;
 $tracking-eyebrow: 0.08em;
 
 $touch-target: 48px;
+$header-height: 56px;
 $container-max: 1240px;
 $container-width: min(92%, $container-max);
 $home-column-max: 760px;
