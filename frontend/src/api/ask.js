@@ -1,6 +1,7 @@
 import { mockResponses, mockErrors } from '../mocks/ask-responses.js';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// Vacío en desarrollo: usa /api y pasa por el proxy de Vite. En producción el workflow pone la URL de Render.
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
 export const MAX_LENGTH = 500; // mismo límite que el backend
