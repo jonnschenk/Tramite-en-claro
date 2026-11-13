@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { askQuestion, validateQuestion, wakeUpServer } from './api/ask.js';
 import Header from './components/Header.jsx';
-import Notice from './components/Notice.jsx';
 import QuestionForm from './components/QuestionForm.jsx';
 import SuggestedQuestions from './components/SuggestedQuestions.jsx';
 import LoadingState from './components/LoadingState.jsx';
@@ -57,6 +56,15 @@ function App() {
     sendQuestion(text);
   }
 
+  // "Nueva pregunta" del header: regresa al home con el campo vacío y listo para escribir.
+  function handleNewQuestion() {
+    setResult(null);
+    setQuestion('');
+    setFormError(null);
+    window.scrollTo({ top: 0 });
+    requestAnimationFrame(() => document.getElementById('question')?.focus());
+  }
+
   async function sendQuestion(text) {
     lastQuestion.current = text;
     setResult({ state: 'loading' });
@@ -73,10 +81,8 @@ function App() {
 
   return (
     <>
-      <Header />
+      <Header isHome={isIdle} onNewQuestion={isIdle || isLoading ? null : handleNewQuestion} />
       <main className={`page${isIdle ? ' page--idle' : ''}`}>
-        <Notice />
-
         {isIdle ? (
           <div className="hero">
             <h1 className="hero__title">
