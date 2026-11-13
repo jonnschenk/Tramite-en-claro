@@ -111,7 +111,7 @@ function App() {
           {isLoading && <LoadingState isWaking={!serverAwake} />}
           {result?.state === 'answered' && <AnswerView data={result.data} />}
           {result?.state === 'no_info' && <NoInfoState data={result.data} />}
-          {result?.state === 'off_topic' && (
+          {(result?.state === 'off_topic' || result?.state === 'needs_detail') && (
             <OffTopicState data={result.data} onSelect={handleSuggestion} />
           )}
           {result?.state === 'error' && (
