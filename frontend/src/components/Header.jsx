@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 
 // isHome: alinea el header a la columna angosta del home.
-// onNewQuestion: si existe, muestra el botón "Nueva pregunta" (solo con un resultado en pantalla).
-function Header({ isHome, onNewQuestion }) {
+// onHome: si existe, muestra el botón "Inicio" (solo fuera del home).
+function Header({ isHome, onHome }) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   // La línea de abajo solo aparece cuando el contenido pasa por debajo del header.
@@ -36,12 +36,18 @@ function Header({ isHome, onNewQuestion }) {
             <span className="visually-hidden">. Verifica siempre en el canal oficial.</span>
           </p>
 
-          {onNewQuestion && (
-            <button className="header__new" type="button" onClick={onNewQuestion}>
-              <svg className="header__new-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          {onHome && (
+            <button className="header__home" type="button" onClick={onHome}>
+              <svg className="header__home-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path
+                  d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinejoin="round"
+                />
               </svg>
-              <span className="header__new-label">Nueva pregunta</span>
+              <span className="header__home-label">Inicio</span>
             </button>
           )}
         </div>

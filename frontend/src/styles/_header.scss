@@ -33,6 +33,11 @@ $bp-header-compact: 480px;
     box-shadow: 0 1px 0 $color-border;
   }
 
+  // En móvil la línea siempre está: separa el header del contenido.
+  @include mobile {
+    box-shadow: 0 1px 0 $color-border;
+  }
+
   &__inner {
     width: $container-width;
     min-height: $header-height;
@@ -127,23 +132,25 @@ $bp-header-compact: 480px;
     }
   }
 
-  &__new {
+  // Acción secundaria: con borde y sin relleno, para no competir con el buscador.
+  &__home {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     min-height: 40px;
     padding: 8px 14px 8px 12px;
-    border: 0;
+    border: 1px solid $color-border;
     border-radius: $radius-pill;
-    background: $color-button;
-    color: #fff;
+    background: $color-surface;
+    color: $color-text;
     font-size: 0.875rem;
     font-weight: 600;
     white-space: nowrap;
     cursor: pointer;
 
     &:hover {
-      background: $color-accent-hover;
+      border-color: $color-accent;
+      color: $color-accent-hover;
     }
 
     @include header-compact {
@@ -153,13 +160,13 @@ $bp-header-compact: 480px;
     }
   }
 
-  &__new-icon {
+  &__home-icon {
     width: 18px;
     height: 18px;
     flex-shrink: 0;
   }
 
-  &__new-label {
+  &__home-label {
     @include header-compact {
       @include hide-visually;
     }
