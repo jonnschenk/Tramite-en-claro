@@ -1,19 +1,17 @@
 @use 'tokens' as *;
 @use 'mixins' as *;
 
-// Alto de la barra fija de abajo en móvil (unos 110 px) más aire para que no tape el contenido.
-$ask-bar-space: 140px;
-
 .page {
   width: $container-width;
   margin-inline: auto;
   padding-top: 24px;
-  padding-bottom: calc(#{$ask-bar-space} + env(safe-area-inset-bottom));
+  // Con resultados, el espacio para el buscador fijo de móvil lo deja el footer.
+  padding-bottom: 32px;
   display: grid;
   gap: 16px;
 
   @include web {
-    padding-bottom: 64px;
+    padding-bottom: 48px;
     gap: 24px;
   }
 
@@ -21,6 +19,7 @@ $ask-bar-space: 140px;
   // así el aire se reparte entre las secciones en lugar de quedar todo arriba y abajo.
   &--idle {
     min-height: calc(100dvh - #{$header-height});
+    padding-bottom: calc(#{$ask-bar-space} + env(safe-area-inset-bottom));
     display: flex;
     flex-direction: column;
     padding-top: clamp(24px, 5vh, 48px);
@@ -33,7 +32,8 @@ $ask-bar-space: 140px;
     @include web {
       display: grid;
       width: min(92%, $home-column-max);
-      padding-block: clamp(32px, 7vh, 72px);
+      min-height: calc(100dvh - #{$header-height} - #{$footer-height});
+      padding-block: clamp(24px, 5vh, 72px);
       align-content: center;
       gap: 0;
 
