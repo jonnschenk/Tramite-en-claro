@@ -3,7 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- maximum-scale evita el zoom automático de iPhone al tocar el campo (pellizcar para hacer zoom sigue funcionando).
+         interactive-widget hace que en Android la página se ajuste al teclado. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, interactive-widget=resizes-content"
+    />
     <title>Trámite en claro</title>
   </head>
   <body>

@@ -10,6 +10,7 @@ import OffTopicState from './components/OffTopicState.jsx';
 import ErrorState from './components/ErrorState.jsx';
 import HowItWorks from './components/HowItWorks.jsx';
 import Credits from './components/Credits.jsx';
+import { useKeyboardOffset } from './utils/useKeyboardOffset.js';
 
 // Preguntas que el corpus sí cubre (fuentes 01, 02, 05 y 06).
 const SUGGESTIONS = [
@@ -24,7 +25,8 @@ function App() {
   const [formError, setFormError] = useState(null);
   const [result, setResult] = useState(null);
   const [serverAwake, setServerAwake] = useState(false);
-  const lastQuestion = useRef(''); // la última pregunta enviada, para "Reintentar"
+  const lastQuestion = useRef('');
+  useKeyboardOffset(); // en móvil, la barra del buscador sube junto con el teclado // la última pregunta enviada, para "Reintentar"
 
   // Al abrir la página despertamos al servidor mientras la persona escribe.
   useEffect(() => {
@@ -87,7 +89,9 @@ function App() {
         {isIdle ? (
           <div className="hero">
             <h1 className="hero__title">
-              Tu acta de nacimiento, en claro<span className="hero__dot">.</span>
+              Tu acta de nacimiento,{' '}
+              <br className="hero__break" />
+              en claro<span className="hero__dot">.</span>
             </h1>
             <Credits className="hero__credits" />
           </div>
