@@ -22,14 +22,35 @@
     padding-bottom: calc(#{$ask-bar-space} + env(safe-area-inset-bottom));
     display: flex;
     flex-direction: column;
-    padding-top: clamp(32px, 6vh, 56px);
+    // Sin gap: el área de resultados (vacía) no debe sumar aire.
+    gap: 0;
+    padding-top: 24px;
 
-    // En móvil el buscador está fijo abajo: las sugerencias se pegan a él.
+    // Móvil: el aire que sobra se reparte igual arriba y abajo; el título queda más arriba
+    // y más separado de las preguntas frecuentes.
+    &::before,
+    &::after {
+      content: '';
+    }
+
+    &::before {
+      flex: 1;
+    }
+
+    &::after {
+      flex: 1;
+    }
+
     .suggestions {
-      margin-top: auto;
+      margin-top: clamp(44px, 9vh, 80px);
     }
 
     @include web {
+      &::before,
+      &::after {
+        content: none;
+      }
+
       display: grid;
       width: $home-width;
       min-height: calc(100dvh - #{$header-height} - #{$footer-height});
@@ -59,13 +80,13 @@
   bottom: var(--keyboard-offset, 0px);
   z-index: 10;
   // Mismo fondo que la página: sin transparencia ni cambio de tono.
-  padding: 10px $gutter calc(12px + env(safe-area-inset-bottom));
+  padding: 12px $gutter calc(24px + env(safe-area-inset-bottom));
   background: $color-bg;
   transition: bottom 0.25s ease-out;
 
   // Con el teclado abierto ya no hace falta el espacio del borde inferior del iPhone.
   :root[data-keyboard-open] & {
-    padding-bottom: 10px;
+    padding-bottom: 12px;
   }
 
   @include web {

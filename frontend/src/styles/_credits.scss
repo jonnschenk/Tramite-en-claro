@@ -68,13 +68,19 @@
 }
 
 // En el footer: el nombre a la izquierda y los links a la derecha.
-// Si no caben juntos (móvil), los links bajan a la siguiente línea.
+// En móvil no caben juntos: nombre y links centrados, uno debajo del otro.
 .footer .credits {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   column-gap: 16px;
   width: 100%;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
 
   .credits__links {
     display: block;
@@ -87,7 +93,7 @@
 
 // Créditos debajo del título del home: solo en móvil y tablet.
 .hero__credits {
-  margin-top: 16px;
+  margin-top: 28px;
 
   @include web {
     display: none;

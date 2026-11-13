@@ -6,6 +6,12 @@
   }
 }
 
+@mixin mobile {
+  @media (max-width: #{$bp-web - 1px}) {
+    @content;
+  }
+}
+
 @mixin glass {
   background: $glass-fallback;
   border: 1px solid $glass-border;

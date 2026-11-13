@@ -3,6 +3,11 @@
 
 .hero {
   &__title {
+    // Recibe el foco al volver al inicio (para lectores de pantalla); no es un control, sin contorno.
+    &:focus {
+      outline: none;
+    }
+
     font-size: clamp(1.875rem, 7vw, 2.875rem);
     font-weight: 800;
     letter-spacing: $tracking-title-tight;

@@ -142,8 +142,17 @@ $field-inset: 20px;
   }
 
   // Empieza a la misma altura que el texto del campo (padding + 1 px de borde).
+  // En móvil el aviso y los errores van arriba del campo: abajo, la barra de Safari los tapa.
+  @include mobile {
+    &__meta,
+    &__error {
+      order: -1;
+    }
+  }
+
   &__meta {
-    padding-inline: $field-inset + 1px;
+    // Solo a la izquierda: el texto arranca donde arranca el del campo.
+    padding-left: $field-inset + 1px;
     display: flex;
     justify-content: space-between;
     gap: 16px;

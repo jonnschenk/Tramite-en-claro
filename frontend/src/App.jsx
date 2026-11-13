@@ -25,12 +25,24 @@ function App() {
   const [formError, setFormError] = useState(null);
   const [result, setResult] = useState(null);
   const [serverAwake, setServerAwake] = useState(false);
-  const lastQuestion = useRef('');
-  useKeyboardOffset(); // en móvil, la barra del buscador sube junto con el teclado // la última pregunta enviada, para "Reintentar"
+  const lastQuestion = useRef(''); // la última pregunta enviada, para "Reintentar"
+  const requestId = useRef(0); // para ignorar respuestas que llegan después de volver al inicio
+  const homeTitle = useRef(null);
+  useKeyboardOffset(); // en móvil, la barra del buscador sube junto con el teclado
 
   // Al abrir la página despertamos al servidor mientras la persona escribe.
   useEffect(() => {
     wakeUpServer().then(() => setServerAwake(true));
+  }, []);
+
+  // "Atrás" del navegador o del celular: si hay un resultado en pantalla, regresa al home
+  // en lugar de salir de la página.
+  useEffect(() => {
+    function handlePopState() {
+      resetToHome();
+    }
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   const isIdle = result === null;
@@ -59,24 +71,43 @@ function App() {
     sendQuestion(text);
   }
 
-  // "Nueva pregunta" del header: regresa al home con el campo vacío y listo para escribir.
-  function handleNewQuestion() {
+  // Deja la pantalla como al abrir la página. El foco va al título para que el lector de pantalla
+  // sepa dónde quedó (no al campo: en el celular abriría el teclado sin que la persona lo pida).
+  function resetToHome() {
+    requestId.current += 1;
     setResult(null);
     setQuestion('');
     setFormError(null);
     window.scrollTo({ top: 0 });
-    requestAnimationFrame(() => document.getElementById('question')?.focus());
+    requestAnimationFrame(() => homeTitle.current?.focus({ preventScroll: true }));
+  }
+
+  // Botón "Inicio" del header. Si el resultado está en el historial, regresa con history.back()
+  // (dispara popstate → resetToHome) para que el historial no acumule pasos de más.
+  function handleHome() {
+    if (window.history.state?.view === 'result') {
+      window.history.back();
+    } else {
+      resetToHome();
+    }
   }
 
   async function sendQuestion(text) {
+    const id = ++requestId.current;
     lastQuestion.current = text;
+    // Al salir del home se agrega un paso al historial; las siguientes preguntas lo reutilizan.
+    if (window.history.state?.view !== 'result') {
+      window.history.pushState({ view: 'result' }, '');
+    }
     setResult({ state: 'loading' });
     const response = await askQuestion(text);
+    if (id !== requestId.current) return; // la persona ya volvió al inicio o preguntó otra cosa
 
     // Si el backend también la rechaza (400), se muestra igual que la validación del frontend.
     if (response.state === 'invalid') {
       setFormError(response.message);
       setResult(null);
+      window.history.replaceState(null, ''); // ya no hay resultado en pantalla
       return;
     }
     setResult(response);
@@ -84,11 +115,11 @@ function App() {
 
   return (
     <>
-      <Header isHome={isIdle} onNewQuestion={isIdle || isLoading ? null : handleNewQuestion} />
+      <Header isHome={isIdle} onHome={isIdle ? null : handleHome} />
       <main className={`page${isIdle ? ' page--idle' : ''}`}>
         {isIdle ? (
           <div className="hero">
-            <h1 className="hero__title">
+            <h1 className="hero__title" ref={homeTitle} tabIndex={-1}>
               Tu acta de nacimiento,{' '}
               <br className="hero__break" />
               en claro<span className="hero__dot">.</span>
