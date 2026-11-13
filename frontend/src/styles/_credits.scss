@@ -1,33 +1,27 @@
 @use 'tokens' as *;
 @use 'mixins' as *;
 
+// Una sola línea: "Hecho por Jonathan M. Ramírez ↗" y los íconos de LinkedIn y GitHub.
 .credits {
-  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
   color: $color-text-secondary;
   font-size: 0.8125rem;
-  line-height: 1.6;
+  line-height: 1.5;
 
   &__by {
+    margin: 0;
     white-space: nowrap;
   }
 
-  &__sep {
-    margin-inline: 8px;
-  }
-
-  // En pantallas angostas: el nombre en una línea y los links en la siguiente.
-  @media (max-width: 559px) {
-    &__links {
-      display: block;
-    }
-
-    &__item:first-child &__sep {
-      display: none;
-    }
-  }
-
-  &__link {
-    color: inherit;
+  // El nombre es el link al portafolio.
+  &__name {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: $color-text;
     font-weight: 600;
     text-decoration: underline;
     text-decoration-color: $color-border;
@@ -37,6 +31,43 @@
       color: $color-accent-hover;
       text-decoration-color: currentColor;
     }
+  }
+
+  &__arrow {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  &__profiles {
+    display: flex;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  // Íconos circulares de 32 px: fáciles de tocar sin pesar más que el texto.
+  &__icon-link {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid $color-border;
+    border-radius: 50%;
+    background: $color-surface;
+    color: $color-text-secondary;
+    transition: color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      border-color: $color-accent;
+      color: $color-accent-hover;
+    }
+  }
+
+  &__icon {
+    width: 15px;
+    height: 15px;
   }
 }
 
@@ -62,21 +93,10 @@
   }
 }
 
-// En el footer (solo desktop): el nombre a la izquierda y los links a la derecha.
+// En el footer (solo desktop): el nombre a la izquierda y los íconos a la derecha.
 .footer .credits {
-  display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
-  column-gap: 16px;
   width: 100%;
-
-  .credits__links {
-    display: block;
-  }
-
-  .credits__item:first-child .credits__sep {
-    display: none;
-  }
 }
 
 // Créditos debajo del título del home: solo en móvil y tablet.
