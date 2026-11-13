@@ -1,11 +1,37 @@
 @use 'tokens' as *;
 @use 'mixins' as *;
 
+// Abajo de este ancho la etiqueta y el botón se acortan para que quepan junto al logo.
+$bp-header-compact: 480px;
+
+@mixin header-compact {
+  @media (max-width: #{$bp-header-compact - 1px}) {
+    @content;
+  }
+}
+
+// Oculto a la vista, pero el lector de pantalla lo sigue leyendo.
+@mixin hide-visually {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 .header {
   position: sticky;
   top: 0;
   z-index: 10;
-  @include glass;
+  background: $color-bg;
+  // La línea es una sombra y no un borde: así no suma 1 px de alto y el home no hace scroll.
+  box-shadow: 0 1px 0 transparent;
+  transition: box-shadow 0.2s ease;
+
+  &--scrolled {
+    box-shadow: 0 1px 0 $color-border;
+  }
 
   &__inner {
     width: $container-width;
@@ -13,6 +39,15 @@
     margin-inline: auto;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    // En el home el header usa la misma columna que el contenido.
+    &--home {
+      @include web {
+        width: min(92%, $home-column-max);
+      }
+    }
   }
 
   &__brand {
@@ -42,9 +77,91 @@
     font-size: 1.1875rem;
     font-weight: 800;
     letter-spacing: -0.05em;
+    white-space: nowrap;
   }
 
   &__dot {
     color: $color-accent;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 5px 12px;
+    background: $color-notice-bg;
+    border: 1px solid $color-notice-border;
+    border-radius: $radius-pill;
+    color: $color-notice-text;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+
+  &__badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &__badge-short {
+    display: none;
+  }
+
+  @include header-compact {
+    &__badge-long {
+      @include hide-visually;
+    }
+
+    &__badge-short {
+      display: inline;
+    }
+  }
+
+  &__new {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+    padding: 8px 14px 8px 12px;
+    border: 0;
+    border-radius: $radius-pill;
+    background: $color-button;
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover {
+      background: $color-accent-hover;
+    }
+
+    @include header-compact {
+      width: 40px;
+      padding: 0;
+      justify-content: center;
+    }
+  }
+
+  &__new-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  &__new-label {
+    @include header-compact {
+      @include hide-visually;
+    }
   }
 }
