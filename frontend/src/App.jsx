@@ -121,8 +121,8 @@ function App() {
           <div className="hero">
             <h1 className="hero__title" ref={homeTitle} tabIndex={-1}>
               Tu acta de nacimiento,{' '}
-              <br className="hero__break" />
-              en claro<span className="hero__dot">.</span>
+              <br />
+              <span className="hero__accent">en claro.</span>
             </h1>
             <Credits className="hero__credits" />
           </div>
