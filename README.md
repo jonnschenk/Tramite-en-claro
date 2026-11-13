@@ -11,7 +11,7 @@ Asistente que responde dudas sobre cómo sacar un acta de nacimiento en la Ciuda
 Es un RAG (generación aumentada por recuperación):
 
 1. **Preparación:** las páginas oficiales se cortan en fragmentos, cada fragmento se convierte en un embedding con Voyage AI y todo se guarda en `index.json`.
-2. **Cada pregunta:** el backend convierte la pregunta en embedding y busca los fragmentos más parecidos. Si ninguno se parece lo suficiente, responde "fuera de tema" sin llamar al modelo. Si sí, el modelo redacta la respuesta usando solo esos fragmentos y citándolos.
+2. **Cada pregunta:** el backend convierte la pregunta en embedding y busca los fragmentos más parecidos. Si ninguno se parece lo suficiente, responde sin llamar al modelo: "fuera de tema" o, si la pregunta tiene 4 palabras o menos, pide más detalle. Si sí, el modelo redacta la respuesta usando solo esos fragmentos y citándolos.
 3. **Evals:** un set de preguntas de prueba que mide si la respuesta y la fuente son correctas y si rechaza lo que está fuera de tema.
 
 El contrato de `POST /ask` está en [docs/api-contract.md](docs/api-contract.md).
@@ -181,6 +181,7 @@ Otros comandos del backend:
 npm run ingest:dry                  # ver los fragmentos sin llamar a Voyage
 npm run ingest                      # regenerar data/index.json
 npm run similarity -- "pregunta"    # ver el puntaje de una pregunta contra el índice
+npm run similarity -- --file evals/short-questions.json   # medir muchas preguntas en una sola petición a Voyage
 npm run evals                       # correr los evals (con el servidor encendido)
 ```
 
@@ -224,6 +225,44 @@ npm run dev            # abre http://localhost:5173
 
 La corrida 1 usó `EVAL_DELAY_MS=21000` por el límite de Voyage sin método de pago. El detalle completo está en `backend/evals/results/`.
 
+## Mejora · Preguntas cortas
+
+Un usuario probó la demo con "Cómo corrijo" y la app respondió "fuera de tema", aunque el corpus sí explica cómo corregir un acta. Mis 20 evals no lo detectaron porque todas eran preguntas completas.
+
+**Lo medí antes de cambiar nada.** Escribí 20 preguntas cortas nuevas (`evals/short-questions.json`: 13 del tema y 7 fuera de tema) y medí su puntaje con `npm run similarity -- --file`. Con el umbral de 0.50, **9 de 13 preguntas del tema se rechazaban.** Además, con preguntas cortas los dos grupos se enciman entre 0.40 y 0.50, así que ningún umbral solo los separa bien.
+
+| Decisión | Alternativa descartada | Razón |
+|---|---|---|
+| Umbral de 0.50 a 0.40; en la zona gris el modelo es el segundo filtro | Dejar 0.50 / buscar un umbral perfecto | Con preguntas cortas los grupos se enciman; el modelo responde `no_info` si los fragmentos no tienen la respuesta |
+| Status nuevo `needs_detail` para preguntas de 4 palabras o menos que no pasan el umbral | Decirles "fuera de tema" | "Cómo corrijo" no es fuera de tema: le falta contexto. Pedir detalle guía a la persona |
+| `needs_detail` usa el mismo componente que "fuera de tema" con otro título | Un componente nuevo | Misma estructura y sugerencias; solo cambia el mensaje |
+| `similarity.js --file` mide muchas preguntas en una sola petición a Voyage | Una petición por pregunta | El límite de Voyage cuenta peticiones, no preguntas |
+| Las preguntas fuera de tema aceptan `off_topic`, `no_info` o `needs_detail` en `questions.json` | Esconder el cambio en el código de los evals | Lo que se mide es que no responda; la lista queda visible |
+| Revisar `finish_reason` / `stop_reason` y dar un error claro si el modelo se corta | Solo "JSON inválido" | Convierte un error vago en uno exacto |
+| Razonamiento del modelo apagado (`reasoning: { effort: 'none' }`) | Subir `MAX_TOKENS` hasta que alcance | El razonamiento ocupaba el 72% de la salida y variaba entre corridas; para leer fragmentos y seguir reglas no hace falta |
+| `MAX_TOKENS` en 2000 | Regresar a 1200 | Solo se paga lo que el modelo escribe; el margen protege respuestas largas sin costo extra |
+
+| | Corrida 2 (umbral 0.50) | Umbral 0.40 | + MAX_TOKENS 2000 | + sin razonamiento |
+|---|---|---|---|---|
+| Pasan todo | 100% (20/20) | 90% (18/20) | 95% (19/20) | **100% (20/20)** |
+| Cita una fuente correcta | 12/12 | 10/12 | 11/12 | **12/12** |
+| Trae el dato clave | 12/12 | 10/12 | 11/12 | **12/12** |
+| Se niega cuando debe | 8/8 | 8/8 | 8/8 | 8/8 |
+| Errores (502) | 0 | 2 | 1 | **0** |
+| Tiempo promedio | 2.0 s | 2.6 s | 2.6 s | **1.6 s** |
+| Preguntas cortas del tema rechazadas | 9/13 | 3/13 | 3/13 | **3/13 (ahora piden detalle)** |
+
+**Errores y aprendizajes de la mejora:**
+
+- **"Cómo corrijo" → fuera de tema:** una pregunta de 2 palabras tiene poco significado para el embedding y queda debajo del umbral. Mis evals solo tenían preguntas completas.
+- **Con umbral 0.40, q04 y q07 daban 502:** llegaban más fragmentos, el modelo escribía más y se cortaba en 1200 tokens, así que el JSON quedaba incompleto. Lo confirmé con el `usage` de OpenRouter.
+- **Con 2000 tokens, q07 a veces pasaba y a veces no (6.8 s vs. 11.9 s):** el modelo razona antes de responder. 832 de 1158 tokens eran razonamiento, y la cantidad cambia en cada corrida. Lo medí con el `usage` de OpenRouter y apagué el razonamiento: 20/20 y 1.6 s.
+- **El 502 de q07 en la corrida 1** lo había atribuido a comillas en el JSON. Probablemente era el mismo corte por tokens; no lo puedo confirmar porque entonces no revisaba `finish_reason`.
+
+**Límites:** una palabra suelta que aparece en el corpus se responde dentro del tema del acta ("pasaporte" responde que sirve como identificación). Una pregunta corta fuera de tema puede recibir "Necesito un poco más de detalle" en lugar de "fuera de tema". Y las 20 preguntas cortas ya se usaron para decidir el umbral, así que medir sin sesgo requiere otro set nuevo.
+
+**Créditos:** la retroalimentación vino de un usuario real. Yo decidí la opción, escribí y revisé las preguntas cortas y corrí las mediciones. El código lo generó Claude; el diagnóstico de tokens y la última corrida de evals los ejecutó Claude Code con mis instrucciones.
+
 ## Límites conocidos
 
 - **Arranque en frío.** Render en plan gratis duerme el servidor después de 15 minutos sin uso. El frontend lo despierta al abrir la página y muestra "Despertando el servidor…". En mi prueba, después de 30 minutos sin uso, `/health` tardó 22.7 s en responder (0.2 s ya despierto); Render avisa que puede pasar de 50 s.
@@ -234,6 +273,7 @@ La corrida 1 usó `EVAL_DELAY_MS=21000` por el límite de Voyage sin método de 
 ## Próximos pasos
 
 - Escribir un set de preguntas nuevo, que no haya usado para ajustar el prompt, y correr los evals contra él.
+- Escribir otro set de preguntas cortas, distinto del que usé para decidir el umbral de 0.40, y medirlo con `npm run similarity -- --file`.
 - Agregar método de pago en Voyage: 3 peticiones por minuto no alcanzan para una demo pública.
 
 ## Cómo uso IA en este proyecto
