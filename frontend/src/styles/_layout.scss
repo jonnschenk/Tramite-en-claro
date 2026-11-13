@@ -5,8 +5,8 @@
   width: $container-width;
   margin-inline: auto;
   padding-top: 24px;
-  // Con resultados, el espacio para el buscador fijo de móvil lo deja el footer.
-  padding-bottom: 32px;
+  // Móvil: espacio para que el buscador fijo no tape el final de la respuesta.
+  padding-bottom: calc(#{$ask-bar-space} + env(safe-area-inset-bottom));
   display: grid;
   gap: 16px;
 

@@ -41,46 +41,34 @@
 }
 
 .footer {
-  width: $container-width;
-  margin-inline: auto;
-  padding-top: 16px;
-  // En móvil el buscador está fijo abajo: el footer deja ese espacio libre para que no lo tape.
-  padding-bottom: calc(#{$ask-bar-space} + env(safe-area-inset-bottom));
-  border-top: 1px solid $color-border;
+  // Móvil y tablet: sin footer. El buscador está fijo abajo y el footer nunca quedaría al final
+  // (como en las apps de chat). Los créditos están en el home, debajo del título.
+  display: none;
 
   @include web {
     display: flex;
     align-items: center;
+    width: $container-width;
     min-height: $footer-height;
-    padding-block: 0;
+    margin-inline: auto;
+    border-top: 1px solid $color-border;
   }
 
-  // Home: en desktop va abajo, alineado a la columna del contenido; en móvil se oculta
-  // porque los créditos ya están debajo del título.
+  // Home en desktop: alineado a la columna del contenido.
   &--home {
-    display: none;
-
     @include web {
-      display: flex;
       width: $home-width;
     }
   }
 }
 
-// En el footer: el nombre a la izquierda y los links a la derecha.
-// En móvil no caben juntos: nombre y links centrados, uno debajo del otro.
+// En el footer (solo desktop): el nombre a la izquierda y los links a la derecha.
 .footer .credits {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   column-gap: 16px;
   width: 100%;
-
-  @include mobile {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
 
   .credits__links {
     display: block;

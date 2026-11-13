@@ -35,16 +35,6 @@ function App() {
     wakeUpServer().then(() => setServerAwake(true));
   }, []);
 
-  // "Atrás" del navegador o del celular: si hay un resultado en pantalla, regresa al home
-  // en lugar de salir de la página.
-  useEffect(() => {
-    function handlePopState() {
-      resetToHome();
-    }
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
   const isIdle = result === null;
   const isLoading = result?.state === 'loading';
 
@@ -81,6 +71,16 @@ function App() {
     window.scrollTo({ top: 0 });
     requestAnimationFrame(() => homeTitle.current?.focus({ preventScroll: true }));
   }
+
+  // "Atrás" del navegador o del celular: si hay un resultado en pantalla, regresa al home
+  // en lugar de salir de la página.
+  useEffect(() => {
+    function handlePopState() {
+      resetToHome();
+    }
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Botón "Inicio" del header. Si el resultado está en el historial, regresa con history.back()
   // (dispara popstate → resetToHome) para que el historial no acumule pasos de más.
