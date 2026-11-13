@@ -3,7 +3,7 @@ import { search } from './retrieve.js';
 import { callModel } from './llm.js';
 import { UpstreamError } from '../errors.js';
 
-const THRESHOLD = Number(process.env.SIMILARITY_THRESHOLD) || 0.5; //Umbral
+const THRESHOLD = Number(process.env.SIMILARITY_THRESHOLD) || 0.4; //Umbral
 const TOP_K = Number(process.env.TOP_K) || 5; //Fragmentos
 
 const OFF_TOPIC = {
@@ -15,6 +15,16 @@ const OFF_TOPIC = {
     'Mi acta tiene un error, ¿cómo la corrijo?',
   ],
 };
+
+const SHORT_MAX_WORDS = 4;
+
+const NEEDS_DETAIL = {
+  status: 'needs_detail',
+  message: 'Tu pregunta es muy corta. Cuéntame un poco más, por ejemplo qué quieres hacer con tu acta.',
+  suggestions: OFF_TOPIC.suggestions,
+};
+
+const wordCount = (text) => text.trim().split(/\s+/).length;
 
 const noInfo = (officialUrl) => ({
   status: 'no_info',
@@ -118,7 +128,9 @@ export async function answerQuestion(question) {
   const results = search(vector, TOP_K);
 
   const relevant = results.filter((r) => r.score >= THRESHOLD);
-  if (relevant.length === 0) return OFF_TOPIC;
+ if (relevant.length === 0) {
+    return wordCount(question) <= SHORT_MAX_WORDS ? NEEDS_DETAIL : OFF_TOPIC;
+  }
 
   const text = await callModel({
     system: SYSTEM_PROMPT,

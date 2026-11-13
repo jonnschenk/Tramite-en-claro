@@ -1,7 +1,7 @@
 import { UpstreamError } from '../errors.js';
 
 const TIMEOUT_MS = 18_000; // Voyage (10 s) + modelo (18 s) caben en los 30 s del frontend
-const MAX_TOKENS = 1200;
+const MAX_TOKENS = 2000;
 
 export async function callModel({ system, user }) {
   const provider = process.env.LLM_PROVIDER || 'openrouter';
@@ -36,13 +36,21 @@ async function callOpenRouter(system, user) {
       model: env.OPENROUTER_MODEL || 'deepseek/deepseek-v4.1-flash',
       max_tokens: MAX_TOKENS,
       temperature: 0,
+      // El modelo razona antes de responder y ese razonamiento cuenta contra max_tokens
+      // (en q07: 832 de 1158 tokens). Para leer fragmentos y seguir reglas no lo necesita.
+      reasoning: { effort: 'none' },
       messages: [
         { role: 'system', content: system },
         { role: 'user', content: user },
       ],
     },
   );
-  return data.choices?.[0]?.message?.content ?? '';
+  const choice = data.choices?.[0];
+  // "length" = el modelo llegó a MAX_TOKENS y su JSON quedó cortado a la mitad.
+  if (choice?.finish_reason === 'length') {
+    throw new UpstreamError('OpenRouter', `respuesta cortada por MAX_TOKENS (${MAX_TOKENS})`);
+  }
+  return choice?.message?.content ?? '';
 }
 
 async function callAnthropic(system, user) {
@@ -59,5 +67,8 @@ async function callAnthropic(system, user) {
       messages: [{ role: 'user', content: user }],
     },
   );
+  if (data.stop_reason === 'max_tokens') {
+    throw new UpstreamError('Claude', `respuesta cortada por MAX_TOKENS (${MAX_TOKENS})`);
+  }
   return data.content?.find((block) => block.type === 'text')?.text ?? '';
 }
