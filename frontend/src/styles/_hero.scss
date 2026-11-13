@@ -10,17 +10,13 @@
 
     font-size: clamp(1.875rem, 7vw, 2.875rem);
     font-weight: 800;
+    // Dos líneas siempre: interlineado un poco más cerrado para que se lean como un solo título.
+    line-height: 1.08;
     letter-spacing: $tracking-title-tight;
   }
 
-  // En móvil "en claro." va en su propia línea.
-  &__break {
-    @include web {
-      display: none;
-    }
-  }
-
-  &__dot {
+  // "en claro." va siempre en su propia línea y con el color del punto del logo.
+  &__accent {
     color: $color-accent;
   }
 }
