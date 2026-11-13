@@ -18,7 +18,7 @@ No se envían ni se guardan datos personales.
 
 ### Respuesta 200: siempre trae `status`
 
-`status` dice qué estado de la pantalla mostrar. Las tres respuestas son 200 porque el sistema funcionó bien, incluso cuando no responde.
+`status` dice qué estado de la pantalla mostrar. Las cuatro respuestas son 200 porque el sistema funcionó bien, incluso cuando no responde.
 
 #### `answered`: hay respuesta con fuentes
 
