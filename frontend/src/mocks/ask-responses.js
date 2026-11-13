@@ -36,6 +36,12 @@ export const mockResponses = {
     message: 'Por ahora solo respondo sobre el acta de nacimiento en la Ciudad de México.',
     suggestions: ['¿Cómo saco mi acta en línea?', '¿Cuánto cuesta una copia certificada?'],
   },
+
+  needsDetail: {
+    status: 'needs_detail',
+    message: 'Tu pregunta es muy corta. Cuéntame un poco más, por ejemplo qué quieres hacer con tu acta.',
+    suggestions: ['¿Cómo saco mi acta en línea?', 'Mi acta tiene un error, ¿cómo la corrijo?'],
+  },
 };
 
 // Errores: código HTTP + cuerpo { error: { code, message } }.

@@ -76,8 +76,22 @@ No se envían ni se guardan datos personales.
 }
 ```
 
+#### `needs_detail`: la pregunta es tan corta que no se entiende
+
+```json
+{
+  "status": "needs_detail",
+  "message": "Tu pregunta es muy corta. Cuéntame un poco más, por ejemplo qué quieres hacer con tu acta.",
+  "suggestions": [
+    "¿Cómo saco mi acta en línea?",
+    "Mi acta tiene un error, ¿cómo la corrijo?"
+  ]
+}
+```
+
 **Cómo se decide cada caso:**
 - `off_topic`: ningún fragmento pasa el umbral de similitud, así que no se llama al modelo.
+- `needs_detail`: ningún fragmento pasa el umbral y la pregunta tiene 4 palabras o menos. Tampoco se llama al modelo.
 - `no_info`: sí hay fragmentos parecidos, pero el modelo indica que la respuesta no está en ellos.
 
 ### Errores: siempre `{ "error": { "code", "message" } }`
@@ -118,3 +132,4 @@ El frontend cancela la petición a los 30 s y muestra el estado 5 (Error). A los
 | 429 / 500 / 502 / red / tiempo agotado | 5. Error |
 | 400 (o validación del frontend) | 6. Pregunta inválida |
 | `status: "off_topic"` | 7. Fuera de tema |
+| `status: "needs_detail"` | 7. Fuera de tema (con título "Necesito un poco más de detalle") |
