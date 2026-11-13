@@ -93,14 +93,6 @@ function App() {
           <h1 className="visually-hidden">Trámite en claro</h1>
         )}
 
-        {isIdle && (
-          <SuggestedQuestions
-            title="Preguntas frecuentes"
-            questions={SUGGESTIONS}
-            onSelect={handleSuggestion}
-          />
-        )}
-
         <div className={`ask-bar${isIdle ? '' : ' ask-bar--docked'}`}>
           <QuestionForm
             value={question}
@@ -110,6 +102,14 @@ function App() {
             error={formError}
           />
         </div>
+
+        {isIdle && (
+          <SuggestedQuestions
+            title="Preguntas frecuentes"
+            questions={SUGGESTIONS}
+            onSelect={handleSuggestion}
+          />
+        )}
 
         {isIdle && <HowItWorks />}
         {/* aria-live: el lector de pantalla anuncia lo que aparece aquí (cargando, respuesta, errores). */}
