@@ -8,6 +8,8 @@ function QuestionForm({ value, onChange, onSubmit, isLoading, error }) {
   const fieldRef = useRef(null);
   const length = value.trim().length;
   const isOver = length > MAX_LENGTH;
+  // El contador solo aparece cerca del límite: con preguntas normales es ruido.
+  const showCounter = length >= MAX_LENGTH * 0.8;
 
   // El campo crece con el texto, también cuando una sugerencia lo llena o se vacía al enviar.
   useLayoutEffect(() => {
@@ -29,7 +31,7 @@ function QuestionForm({ value, onChange, onSubmit, isLoading, error }) {
     }
   }
 
-  const describedBy = ['question-hint', 'question-counter', error && 'question-error']
+  const describedBy = ['question-hint', showCounter && 'question-counter', error && 'question-error']
     .filter(Boolean)
     .join(' ');
 
@@ -75,10 +77,12 @@ function QuestionForm({ value, onChange, onSubmit, isLoading, error }) {
         <p className="question-form__hint" id="question-hint">
           No escribas datos personales como tu CURP.
         </p>
-        <p className={`question-form__counter${isOver ? ' question-form__counter--over' : ''}`} id="question-counter">
-          {length}/{MAX_LENGTH}
-          <span className="visually-hidden"> caracteres</span>
-        </p>
+        {showCounter && (
+          <p className={`question-form__counter${isOver ? ' question-form__counter--over' : ''}`} id="question-counter">
+            {length}/{MAX_LENGTH}
+            <span className="visually-hidden"> caracteres</span>
+          </p>
+        )}
       </div>
 
       {error && (

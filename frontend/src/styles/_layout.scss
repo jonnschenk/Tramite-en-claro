@@ -17,14 +17,37 @@ $ask-bar-space: 140px;
     gap: 24px;
   }
 
-  // En el home todo cabe en la pantalla: el contenido se centra en el alto disponible.
+  // Home: todo cabe en la pantalla. Los espacios crecen con el alto de la pantalla (vh),
+  // así el aire se reparte entre las secciones en lugar de quedar todo arriba y abajo.
   &--idle {
+    min-height: calc(100dvh - #{$header-height});
+    display: flex;
+    flex-direction: column;
+    padding-top: clamp(24px, 5vh, 48px);
+
+    // En móvil el buscador está fijo abajo: las sugerencias se pegan a él.
+    .suggestions {
+      margin-top: auto;
+    }
+
     @include web {
+      display: grid;
       width: min(92%, $home-column-max);
-      min-height: calc(100dvh - #{$header-height});
-      padding-block: 32px;
+      padding-block: clamp(32px, 7vh, 72px);
       align-content: center;
-      gap: 20px;
+      gap: 0;
+
+      .ask-bar {
+        margin-top: clamp(24px, 4.5vh, 44px);
+      }
+
+      .suggestions {
+        margin-top: clamp(24px, 4vh, 36px);
+      }
+
+      .how {
+        margin-top: clamp(32px, 5.5vh, 56px);
+      }
     }
   }
 }

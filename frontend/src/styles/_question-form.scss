@@ -1,5 +1,8 @@
 @use 'tokens' as *;
 
+// Distancia del borde izquierdo de la barra al texto.
+$field-inset: 20px;
+
 .question-form {
   display: grid;
   gap: 8px;
@@ -8,7 +11,7 @@
     display: flex;
     align-items: flex-end;
     gap: 8px;
-    padding: 4px 4px 4px 20px;
+    padding: 4px 4px 4px $field-inset;
     background: $color-surface;
     border: 1px solid $color-input-border;
     // Radio fijo (mitad de la altura con una línea): se ve como píldora y sigue bien cuando el campo crece.
@@ -109,7 +112,9 @@
     animation: question-form-spin 0.8s linear infinite;
   }
 
+  // Empieza a la misma altura que el texto del campo (padding + 1 px de borde).
   &__meta {
+    padding-inline: $field-inset + 1px;
     display: flex;
     justify-content: space-between;
     gap: 16px;
