@@ -2,11 +2,11 @@
 
 .notice {
   margin: 0;
-  padding: 12px 16px;
+  padding: 10px 16px;
   background: $color-notice-bg;
   border: 1px solid $color-notice-border;
-  border-radius: $radius-input;
+  border-radius: 14px;
   color: $color-notice-text;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   line-height: 1.5;
 }

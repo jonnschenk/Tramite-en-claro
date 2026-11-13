@@ -1,7 +1,8 @@
 @use 'tokens' as *;
 @use 'mixins' as *;
 
-$ask-bar-space: 200px;
+// Alto de la barra fija de abajo en móvil (unos 110 px) más aire para que no tape el contenido.
+$ask-bar-space: 140px;
 
 .page {
   width: $container-width;
@@ -16,10 +17,14 @@ $ask-bar-space: 200px;
     gap: 24px;
   }
 
+  // En el home todo cabe en la pantalla: el contenido se centra en el alto disponible.
   &--idle {
     @include web {
       width: min(92%, $home-column-max);
-      padding-top: 48px;
+      min-height: calc(100dvh - #{$header-height});
+      padding-block: 32px;
+      align-content: center;
+      gap: 20px;
     }
   }
 }
@@ -45,7 +50,7 @@ $ask-bar-space: 200px;
   &--docked {
     @include web {
       position: sticky;
-      top: 76px;
+      top: $header-height + 12px;
       padding: 12px;
       margin-inline: -12px;
       border-radius: $radius-card-web;

@@ -9,7 +9,7 @@
 
   &__inner {
     width: $container-width;
-    min-height: 64px;
+    min-height: $header-height;
     margin-inline: auto;
     display: flex;
     align-items: center;
@@ -29,8 +29,8 @@
   }
 
   &__logo {
-    width: 32px;
-    height: 32px;
+    width: 29px;
+    height: 29px;
     flex-shrink: 0;
   }
 
@@ -39,7 +39,7 @@
   }
 
   &__name {
-    font-size: 1.25rem;
+    font-size: 1.1875rem;
     font-weight: 800;
     letter-spacing: -0.05em;
   }

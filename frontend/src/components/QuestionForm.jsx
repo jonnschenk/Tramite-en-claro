@@ -1,10 +1,20 @@
-import { useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
+
+// Altura máxima del campo (unas 4 líneas); arriba de eso aparece scroll.
+const MAX_INPUT_HEIGHT = 120;
 import { MAX_LENGTH } from '../api/ask.js';
 
 function QuestionForm({ value, onChange, onSubmit, isLoading, error }) {
   const fieldRef = useRef(null);
   const length = value.trim().length;
   const isOver = length > MAX_LENGTH;
+
+  // El campo crece con el texto, también cuando una sugerencia lo llena o se vacía al enviar.
+  useLayoutEffect(() => {
+    const field = fieldRef.current;
+    field.style.height = 'auto';
+    field.style.height = `${Math.min(field.scrollHeight, MAX_INPUT_HEIGHT)}px`;
+  }, [value]);
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -34,7 +44,7 @@ function QuestionForm({ value, onChange, onSubmit, isLoading, error }) {
           ref={fieldRef}
           id="question"
           className="question-form__input"
-          rows={2}
+          rows={1}
           placeholder="Escribe tu duda sobre el acta…"
           value={value}
           onChange={(event) => onChange(event.target.value)}
@@ -44,8 +54,20 @@ function QuestionForm({ value, onChange, onSubmit, isLoading, error }) {
           aria-describedby={describedBy}
         />
 
-        <button className="question-form__submit" type="submit" disabled={isLoading}>
-          {isLoading ? 'Buscando…' : 'Preguntar'}
+        <button
+          className="question-form__submit"
+          type="submit"
+          disabled={isLoading}
+          aria-label={isLoading ? 'Buscando…' : 'Preguntar'}
+        >
+          {isLoading ? (
+            <span className="question-form__spinner" aria-hidden="true" />
+          ) : (
+            <svg className="question-form__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" strokeWidth="2" />
+              <path d="M16 16l4.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          )}
         </button>
       </div>
 

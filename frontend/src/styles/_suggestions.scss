@@ -18,8 +18,9 @@
   }
 
   &__pill {
-    min-height: $touch-target;
-    padding: 10px 16px;
+    min-height: 46px;
+    padding: 9px 16px;
+    font-size: 0.9375rem;
     background: $color-surface;
     border: 1px solid $color-border;
     border-radius: $radius-pill;
