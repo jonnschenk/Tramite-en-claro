@@ -32,9 +32,12 @@ async function ask(question) {
   }
 }
 
+const accepted = (item) => [].concat(item.expected);
+const REFUSALS = ['no_info', 'off_topic', 'needs_detail'];
+
 function grade(item, { status, body }) {
-  const result = { statusOk: status === item.expected, sourceOk: null, contentOk: null };
-  const refused = status === 'no_info' || status === 'off_topic';
+  const result = { statusOk: accepted(item).includes(status), sourceOk: null, contentOk: null };
+  const refused = REFUSALS.includes(status);
 
   if (item.expected === 'answered') {
     if (status === 'answered') {
@@ -75,7 +78,7 @@ for (const [i, item] of questions.entries()) {
   rows.push({ ...item, got: response.status, ms: response.ms, ...result, response: response.body });
 
   const mark = result.pass ? '✓' : '✗';
-  console.log(`${mark} ${item.id}  esperado: ${item.expected.padEnd(9)}  obtuvo: ${response.status.padEnd(9)}  ${response.ms} ms  ${item.question}`);
+  console.log(`${mark} ${item.id}  esperado: ${accepted(item).join('|').padEnd(9)} obtuvo: ${response.status.padEnd(9)}  ${response.ms} ms  ${item.question}`);
 }
 
 const pct = (n, d) => (d ? `${Math.round((n / d) * 100)}% (${n}/${d})` : '—');

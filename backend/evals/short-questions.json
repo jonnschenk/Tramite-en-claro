@@ -1,0 +1,22 @@
+[
+  { "question": "Cómo corrijo", "expected": "in" },
+  { "question": "corregir acta", "expected": "in" },
+  { "question": "error en mi apellido", "expected": "in" },
+  { "question": "cuánto cuesta", "expected": "in" },
+  { "question": "costo del acta", "expected": "in" },
+  { "question": "acta en línea", "expected": "in" },
+  { "question": "requisitos", "expected": "in" },
+  { "question": "horarios", "expected": "in" },
+  { "question": "copia certificada", "expected": "in" },
+  { "question": "dónde la saco", "expected": "in" },
+  { "question": "olvidé mi contraseña", "expected": "in" },
+  { "question": "no sé mi juzgado", "expected": "in" },
+  { "question": "acta", "expected": "in" },
+  { "question": "pasaporte", "expected": "out" },
+  { "question": "licencia de conducir", "expected": "out" },
+  { "question": "sacar mi INE", "expected": "out" },
+  { "question": "chilaquiles", "expected": "out" },
+  { "question": "hola", "expected": "out" },
+  { "question": "clima de hoy", "expected": "out" },
+  { "question": "acta de matrimonio", "expected": "out" }
+]
