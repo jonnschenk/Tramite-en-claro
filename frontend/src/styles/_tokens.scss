@@ -54,6 +54,9 @@ $tracking-eyebrow: 0.08em;
 
 $touch-target: 48px;
 $header-height: 56px;
+$footer-height: 56px;
+// Alto de la barra fija de abajo en móvil (unos 110 px) más aire para que no tape el contenido.
+$ask-bar-space: 140px;
 $container-max: 1240px;
 $container-width: min(92%, $container-max);
 $home-column-max: 760px;

@@ -9,6 +9,7 @@ import NoInfoState from './components/NoInfoState.jsx';
 import OffTopicState from './components/OffTopicState.jsx';
 import ErrorState from './components/ErrorState.jsx';
 import HowItWorks from './components/HowItWorks.jsx';
+import Credits from './components/Credits.jsx';
 
 // Preguntas que el corpus sí cubre (fuentes 01, 02, 05 y 06).
 const SUGGESTIONS = [
@@ -88,6 +89,7 @@ function App() {
             <h1 className="hero__title">
               Tu acta de nacimiento, en claro<span className="hero__dot">.</span>
             </h1>
+            <Credits className="hero__credits" />
           </div>
         ) : (
           <h1 className="visually-hidden">Trámite en claro</h1>
@@ -125,6 +127,9 @@ function App() {
           )}
         </section>
       </main>
+      <footer className={`footer${isIdle ? ' footer--home' : ''}`}>
+        <Credits />
+      </footer>
     </>
   );
 }
