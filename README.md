@@ -330,7 +330,7 @@ Uso Claude Code como par de programación. Yo decido qué se construye y por qu�
 
 - **Fase 1 (diseño):** los mockups de móvil y web se armaron con Claude Design a partir del sistema de diseño de mi portafolio; yo tomé las decisiones y elegí el logo entre las opciones que diseñé.
 - **Fases 2 y 3 (frontend, backend y evals):** el frontend lo hice de forma asistida con Claude Code. Mi primer backend lo construí aprendiendo con Claude: me ayudó a generar el código paso a paso, con explicaciones y con base en mis decisiones; yo lo probé, calibré el umbral y decidí entre las alternativas. Las preguntas de evals las redacté con ayuda de Claude y las verifiqué contra las fuentes.
-- **Limpieza:** la pasada de comentarios y del README (commit `add5e25`) la hizo Claude Code siguiendo los criterios que le di.
+- **Limpieza:** la pasada de comentarios y del README (commit `78486e4`) la hizo Claude Code siguiendo los criterios que le di.
 - **Fase 4 (despliegue):** el código del despertar, el workflow de GitHub Actions y el cambio en `vite.config.js` los generó Claude; yo los integré, los probé en producción y decidí las plataformas. El comentario JSX que se veía en la página lo encontré yo.
 - **Rediseño del frontend:** las decisiones de diseño y qué cambiar las tomé yo al revisar la página en mi celular; Claude Code implementó los cambios, los midió en varios tamaños con Chrome sin ventana y me propuso alternativas cuando algo no convencía.
 
