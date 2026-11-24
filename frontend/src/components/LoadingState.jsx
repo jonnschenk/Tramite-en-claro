@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import AnswerSkeleton from './AnswerSkeleton.jsx';
 
 const SLOW_AFTER_MS = 10_000;
 
@@ -15,13 +16,9 @@ function LoadingState({ isWaking = false }) {
   else if (isSlow) text = 'Sigue buscando…';
 
   return (
-    <div className="card loading">
+    <div className="loading">
       <p className="loading__text">{text}</p>
-      <div className="loading__skeleton" aria-hidden="true">
-        <span className="loading__line loading__line--wide" />
-        <span className="loading__line" />
-        <span className="loading__line loading__line--short" />
-      </div>
+      <AnswerSkeleton />
     </div>
   );
 }

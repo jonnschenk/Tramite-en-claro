@@ -9,29 +9,79 @@
     color: $color-text-secondary;
     font-weight: 500;
   }
+}
 
-  &__skeleton {
-    display: grid;
-    gap: 10px;
+// Barra base del skeleton, con el mismo brillo que tenía antes.
+.skeleton {
+  display: block;
+  width: 80%;
+  height: 14px;
+  border-radius: $radius-pill;
+  background: linear-gradient(90deg, $color-fill-soft 25%, $color-bg 50%, $color-fill-soft 75%);
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.4s ease-in-out infinite;
+
+  &--wide {
+    width: 100%;
   }
 
-  &__line {
-    display: block;
-    width: 80%;
-    height: 14px;
-    border-radius: $radius-pill;
-    background: linear-gradient(90deg, $color-fill-soft 25%, $color-bg 50%, $color-fill-soft 75%);
-    background-size: 200% 100%;
-    animation: loading-shimmer 1.4s ease-in-out infinite;
-
-    &--wide {
-      width: 100%;
-    }
-
-    &--short {
-      width: 55%;
-    }
+  &--medium {
+    width: 72%;
   }
+
+  &--short {
+    width: 45%;
+  }
+
+  &--eyebrow {
+    width: 88px;
+    height: 12px;
+  }
+
+  &--spaced {
+    margin-bottom: 16px;
+  }
+
+  &--circle,
+  &--circle-small {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+  }
+
+  &--circle-small {
+    width: 28px;
+    height: 28px;
+  }
+
+  &--button {
+    width: 190px;
+    height: $touch-target;
+  }
+}
+
+.skeleton-group {
+  display: grid;
+  gap: 10px;
+
+  &--grow {
+    flex: 1;
+    padding-top: 4px;
+  }
+}
+
+.skeleton-list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skeleton-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
 }
 
 @keyframes loading-shimmer {
@@ -41,5 +91,12 @@
 
   to {
     background-position: -200% 0;
+  }
+}
+
+// Quien pide menos movimiento ve las barras quietas.
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
   }
 }
